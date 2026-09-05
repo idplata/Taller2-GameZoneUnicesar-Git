@@ -2,7 +2,7 @@ package com.gamezone.model;
 
 public class Customer extends Person {
 
-    protected String email;
+    private String email;
 
     public Customer(String id, String name, String phone, String email){
         super(id, name, phone);

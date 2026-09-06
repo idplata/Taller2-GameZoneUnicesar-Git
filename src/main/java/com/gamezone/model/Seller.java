@@ -1,5 +1,13 @@
 package com.gamezone.model;
-
+/**
+ * Representa a un vendedor (empleado) de la tienda GameZone Unicesar:
+ * una persona que atiende clientes y registra ventas. Además de los
+ * atributos que comparte con {@link Person}, un vendedor tiene un
+ * código de empleado y un turno de trabajo asignado.
+ * <p>
+ * Los vendedores se precargan en el sistema en la primera ejecución y
+ * no están pensados para registrarse desde la interfaz de usuario.
+ */
 public class Seller extends Person {
 
     private String employeeCode;
@@ -19,6 +27,7 @@ public class Seller extends Person {
 
     public void setShift(String shift){this.shift = shift;}
 
+    //Sobreescribe el metodo
     @Override
     public String getRoleDescription() {
         return "Seller (employee code: " + employeeCode + ", shift: " + shift + ")";

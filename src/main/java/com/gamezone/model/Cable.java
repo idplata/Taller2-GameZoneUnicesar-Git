@@ -1,13 +1,20 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.gamezone.model;
 
-/**
- *
- * @author Admin
- */
-public class Cable {
+
+import com.gamezone.model.Accesory;
+
+public class Cable extends Accesory{
+    private int length;
+    private String type;
+  
+    public Cable(String id, String title, String price, String amount, int length, String type) {
+        super(id, title, price, amount);
+        this.length=length;
+        this.type=type;
+    }
+    
+    public String getType(){return type;}
+    public int getLenght(){ return length;}
+    
     
 }

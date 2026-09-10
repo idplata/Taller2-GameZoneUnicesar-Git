@@ -1,0 +1,54 @@
+# AI Usage Log — Developer 2
+
+This log records AI-assisted decisions taken by the Developer 2 role during the development of the Person module.
+
+### Entry 1
+
+**Date:** 2026-09-04
+**Tool used:** Deepseek
+
+**Reason for use:**
+Unclone a repository because I cloned it into the wrong folder.
+
+**Problem faced:**
+The repository is located in the wrong place within your directory structure.It becomes difficult to find the project later, especially if you work with multiple repositories.
+
+**Prompt used:**
+como hago para desclonar un repositorio de git hub en una carpeta local
+
+**Solution obtained and decision taken:**
+Move the folder to the correct directory using the `mv` command, preserving the entire Git history, commits, and changes without losing anything.Verify that the repository works correctly in the new location using `git status` and `git log`.
+
+### Entry 2
+
+**Date:** 2026-09-04
+**Tool used:** Claude
+
+**Reason for use:**
+Aiming to implement persistence using flat files with the most efficient read and write operations.
+
+**Problem faced:**
+If a field—such as a customer name—contains the same character used as a separator (for example, a comma or a semicolon), parsing the line fails because the `split()` method breaks the string at the wrong place.
+
+**Prompt used:**
+Apunta al rendimiento en la persistencia, dime cuales escritura de datos recomiendas, ademas dime en pocas palabras que tengoo que hacer, no me des nada de codigo
+
+*Solution obtained and decision taken:**
+A character unlikely to appear in normal data (;) was chosen as the field separator, and validation was added to ensure that mandatory fields are never null or empty before being written to the file, thereby reducing the risk of malformed lines.
+
+### Entry 3
+
+**Date:** 2026-09-06
+**Tool used:** Claude
+
+**Reason for use:**
+understand JavaDoc code documentation and how it is created
+
+**Problem faced:**
+Sometimes, standard tags were used incorrectly.
+
+**Prompt used:**
+Explicame el javaDoc, para aplicarlos en los comentarios
+
+**Solution obtained and decision taken:**
+The Javadoc for each method was structured according to the standard order: first a brief description, then @param for each parameter (in the same order as they appear in the method signature), followed by @return (where applicable), and finally @throws for any exceptions the method might throw.

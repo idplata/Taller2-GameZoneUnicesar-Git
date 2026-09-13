@@ -45,6 +45,8 @@ public class AccesoryRepository {
         }
     }
  
+     return accessories;
+    }
     public List<Accessory> loadAll() {
         List<Accessory> accessories = new ArrayList<>();
         Path path = Paths.get(FILE_PATH);

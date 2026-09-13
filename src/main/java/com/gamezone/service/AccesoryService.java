@@ -63,6 +63,15 @@ public class AccesoryService {
         }
         return result;
     }
+     public List<Accessory> findAccessoriesCompatibleWith(String consoleId) {
+        List<Accessory> result = new ArrayList<>();
+        for (Accessory accessory : accessories) {
+            if (accessory.isCompatibleWith(consoleId)) {
+                result.add(accessory);
+            }
+        }
+        return result;
+    }
        public void updateStock(String accessoryId, int quantity) {
         Accessory accessory = findById(accessoryId);
         int newStock = accessory.getStock() + quantity;

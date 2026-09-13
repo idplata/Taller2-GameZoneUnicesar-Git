@@ -15,14 +15,21 @@ import java.util.Optional;
 
 public class AccesoryService {
     
-    private final AccesoryRepository repository;
-    private final List<Cable> cables;
-    private final List<Controller>controllers ;
-    private final List<Memory> memories;
     
-     public AccesoryService(AccesoryRepository repository) {
-        this.repository = repository;
-        this.cables = repository.loadCable();
-        this.memories = repository.loadMemory();
-        this.controllers = repository.loadController();
+    private final AccesoryRepository accessoryRepository;
+    private List<Accessory> accessories;
+ 
+    public AccessoryService(AccesoryRepository accessoryRepository) {
+        this.accessoryRepository = accessoryRepository;
+        this.accessories = new ArrayList<>(accessoryRepository.loadAll());
+    }
+    public Controller registerController(String id, String title, double price, int stock,
+                                          String connectionType, List<String> compatibleConsoleIds) {
+        Controller controller = new Controller(id, title, price, stock, connectionType);
+        if (compatibleConsoleIds != null) {
+            controller.setCompatibleConsoleIds(new ArrayList<>(compatibleConsoleIds));
+        }
+        accessories.add(controller);
+        persist();
+        return controller;
     }

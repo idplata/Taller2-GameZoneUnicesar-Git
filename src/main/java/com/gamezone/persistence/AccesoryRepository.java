@@ -69,3 +69,23 @@ public class AccesoryRepository {
         }
         return accessories;
     }
+    private String toCsvLine(Accessory accessory) {
+        String consoleIds = String.join(CONSOLE_LIST_JOINER, accessory.getCompatibleConsoleIds());
+        StringBuilder line = new StringBuilder();
+        line.append(accessory.getTypeDiscriminator()).append(SEPARATOR)
+                .append(accessory.getId()).append(SEPARATOR)
+                .append(accessory.getTitle()).append(SEPARATOR)
+                .append(accessory.getPrice()).append(SEPARATOR)
+                .append(accessory.getStock()).append(SEPARATOR)
+                .append(consoleIds).append(SEPARATOR);
+ 
+        if (accessory instanceof Controller controller) {
+            line.append(controller.getConnectionType());
+        } else if (accessory instanceof Cable cable) {
+            line.append(cable.getLengthMeters()).append(SEPARATOR).append(cable.getConnectorType());
+        } else if (accessory instanceof Memory memory) {
+            line.append(memory.getCapacityGb()).append(SEPARATOR).append(memory.getMemoryType());
+        }
+ 
+        return line.toString();
+    }

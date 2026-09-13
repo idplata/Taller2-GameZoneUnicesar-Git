@@ -33,3 +33,10 @@ public class AccesoryService {
         persist();
         return controller;
     }
+     public Cable registerCable(String id, String title, double price, int stock,
+                                double lengthMeters, String connectorType) {
+        Cable cable = new Cable(id, title, price, stock, lengthMeters, connectorType);
+        accessories.add(cable);
+        persist();
+        return cable;
+    }

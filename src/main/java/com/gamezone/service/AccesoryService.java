@@ -40,3 +40,26 @@ public class AccesoryService {
         persist();
         return cable;
     }
+     public Memory registerMemory(String id, String title, double price, int stock,
+                                  int capacityGb, String memoryType, List<String> compatibleConsoleIds) {
+        Memory memory = new Memory(id, title, price, stock, capacityGb, memoryType);
+        if (compatibleConsoleIds != null) {
+            memory.setCompatibleConsoleIds(new ArrayList<>(compatibleConsoleIds));
+        }
+        accessories.add(memory);
+        persist();
+        return memory;
+    }
+      public List<Accessory> listAllAccessories() {
+        return new ArrayList<>(accessories);
+    }
+ 
+    public List<Accessory> listAccessoriesByType(String type) {
+        List<Accessory> result = new ArrayList<>();
+        for (Accessory accessory : accessories) {
+            if (accessory.getTypeDiscriminator().equalsIgnoreCase(type)) {
+                result.add(accessory);
+            }
+        }
+        return result;
+    }

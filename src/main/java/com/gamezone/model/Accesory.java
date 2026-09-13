@@ -6,18 +6,18 @@ public abstract class Accesory {
     protected String id;
     protected String title;
     protected String price;
-    protected String amount; 
+    protected String stock; 
     
-    public Accesory (String id, String title, String price, String amount){
+    public Accesory (String id, String title, String price, String stock){
         this.id = id;
         this.title = title;
         this.price = price;
-        this.amount = amount;
+        this.stock = stock;
     }
     public String getId() { return id; }
     public String getTitle() { return title; }
     public String getPrice() { return price; }
-    public String getAmount() { return amount; }
+    public String getStock() { return stock; }
     
 
     public String getDescription() {
@@ -25,6 +25,6 @@ public abstract class Accesory {
                " | Id: " + getId() + 
                " | Title: " + getTitle() +  
                " | Price: $" + getPrice() + 
-               " | Amount: " + getAmount();
+               " | Stock: " + getStock();
     }
 }

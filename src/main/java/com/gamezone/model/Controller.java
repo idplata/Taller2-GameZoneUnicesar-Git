@@ -5,20 +5,14 @@
 package com.gamezone.model;
 
 public class Controller extends Accesory{
-    private String wired;
-    private String wireless;
-    private String type;
+    private String  connectionType;
   
-    public Controller (String id, String title, String price, String amount,String wired,String wireless, String type) {
-        super(id, title, price, amount);
-        this.wired=wired;
-        this.wireless=wireless;
-        this.type=type;
+    public Controller (String id, String title, String price, String stock,String  connectionType) {
+        super(id, title, price, stock);
+        this.connectionType=connectionType;
     }
 
-    public String getType(){return type;}
-    public String getWired(){ return wired;}
-    public String getWireless(){ return wireless;}
+    public String getConnectionType(){return connectionType;}
     
     
 }

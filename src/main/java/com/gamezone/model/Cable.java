@@ -7,15 +7,15 @@ package com.gamezone.model;
 
 public class Cable extends Accesory{
     private String length;
-    private String type;
+    private String connectortype;
   
-    public Cable(String id, String title, String price, String amount, String length, String type) {
-        super(id, title, price, amount);
+    public Cable(String id, String title, String price, String stock, String length, String connectortype) {
+        super(id, title, price, stock);
         this.length=length;
-        this.type=type;
+        this.connectortype=connectortype;
     }
     
-    public String getType(){return type;}
+    public String getConnectortype(){return connectortype;}
     public String getLenght(){ return length;}
     
     

@@ -105,3 +105,19 @@ public class AccesoryRepository {
                 compatibleConsoleIds.add(consoleId);
             }
         }
+        Accessory accessory = switch (type) {
+            case "CONTROLLER" -> new Controller(id, title, price, stock, fields[6]);
+            case "CABLE" -> new Cable(id, title, price, stock,
+                    Double.parseDouble(fields[6]), fields[7]);
+            case "MEMORY" -> new Memory(id, title, price, stock,
+                    Integer.parseInt(fields[6]), fields[7]);
+            default -> null;
+        };
+ 
+        if (accessory != null) {
+            accessory.setCompatibleConsoleIds(compatibleConsoleIds);
+        }
+ 
+        return accessory;
+    }
+}

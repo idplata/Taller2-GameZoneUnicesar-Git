@@ -6,15 +6,15 @@ package com.gamezone.model;
 
 public class Memory extends Accesory{
     private String Gigabytes;
-    private String type;
+    private String memorytype;
   
-    public Memory (String id, String title, String price, String amount, String Gigabytes, String type) {
-        super(id, title, price, amount);
+    public Memory (String id, String title, String price, String stock, String Gigabytes, String memorytype) {
+        super(id, title, price, stock);
         this.Gigabytes=Gigabytes;
-        this.type=type;
+        this.memorytype=memorytype;
     }
     
-    public String getType(){return type;}
+    public String getMemoryType(){return memorytype;}
     public String getGigabyte(){ return Gigabytes;}
     
     

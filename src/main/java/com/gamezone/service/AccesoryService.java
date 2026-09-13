@@ -72,6 +72,13 @@ public class AccesoryService {
         }
         return result;
     }
+     public Accessory findById(String id) {
+        Optional<Accessory> found = accessories.stream()
+                .filter(a -> a.getId().equals(id))
+                .findFirst();
+        return found.orElseThrow(() ->
+                new NoSuchElementException("No accessory found with id: " + id));
+    }
        public void updateStock(String accessoryId, int quantity) {
         Accessory accessory = findById(accessoryId);
         int newStock = accessory.getStock() + quantity;

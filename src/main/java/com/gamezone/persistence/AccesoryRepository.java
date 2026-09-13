@@ -89,3 +89,19 @@ public class AccesoryRepository {
  
         return line.toString();
     }
+     private Accessory fromCsvLine(String line) {
+        String[] fields = line.split(SEPARATOR, -1);
+ 
+        String type = fields[0];
+        String id = fields[1];
+        String title = fields[2];
+        double price = Double.parseDouble(fields[3]);
+        int stock = Integer.parseInt(fields[4]);
+        String consoleIdsRaw = fields[5];
+ 
+        List<String> compatibleConsoleIds = new ArrayList<>();
+        if (!consoleIdsRaw.isBlank()) {
+            for (String consoleId : consoleIdsRaw.split(CONSOLE_LIST_DELIMITER)) {
+                compatibleConsoleIds.add(consoleId);
+            }
+        }

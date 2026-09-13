@@ -63,3 +63,17 @@ public class AccesoryService {
         }
         return result;
     }
+       public void updateStock(String accessoryId, int quantity) {
+        Accessory accessory = findById(accessoryId);
+        int newStock = accessory.getStock() + quantity;
+        if (newStock < 0) {
+            throw new IllegalStateException("Insufficient stock for accessory: " + accessoryId);
+        }
+        accessory.setStock(newStock);
+        persist();
+    }
+ 
+    private void persist() {
+        accessoryRepository.saveAll(accessories);
+    }
+}

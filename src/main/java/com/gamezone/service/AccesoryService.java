@@ -1,95 +1,99 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.gamezone.service;
+
+import com.gamezone.model.Accesory;
 import com.gamezone.model.Cable;
 import com.gamezone.model.Controller;
 import com.gamezone.model.Memory;
 import com.gamezone.persistence.AccesoryRepository;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public class AccesoryService {
-    
-    
-    private final AccesoryRepository accessoryRepository;
-    private List<Accessory> accessories;
- 
-    public AccessoryService(AccesoryRepository accessoryRepository) {
-        this.accessoryRepository = accessoryRepository;
-        this.accessories = new ArrayList<>(accessoryRepository.loadAll());
+
+    private final AccesoryRepository accesoryRepository;
+    private List<Accesory> accesories;
+
+    public AccesoryService(AccesoryRepository accesoryRepository) {
+        this.accesoryRepository = accesoryRepository;
+        this.accesories = new ArrayList<>(accesoryRepository.loadAll());
     }
-    public Controller registerController(String id, String title, double price, int stock,
-                                          String connectionType, List<String> compatibleConsoleIds) {
-        Controller controller = new Controller(id, title, price, stock, connectionType);
-        if (compatibleConsoleIds != null) {
-            controller.setCompatibleConsoleIds(new ArrayList<>(compatibleConsoleIds));
+
+    public Controller registerController(String id, String title, double price, int quantity,
+                                          String connectionType, List<String> compatibleConsoles) {
+        Controller controller = new Controller(id, title, price, quantity, connectionType);
+        if (compatibleConsoles != null) {
+            controller.setCompatibleConsoles(new ArrayList<>(compatibleConsoles));
         }
-        accessories.add(controller);
+        accesories.add(controller);
         persist();
         return controller;
     }
-     public Cable registerCable(String id, String title, double price, int stock,
-                                double lengthMeters, String connectorType) {
-        Cable cable = new Cable(id, title, price, stock, lengthMeters, connectorType);
-        accessories.add(cable);
+
+    public Cable registerCable(String id, String title, double price, int quantity,
+                                double length, String connectorType) {
+        Cable cable = new Cable(id, title, price, quantity, length, connectorType);
+        accesories.add(cable);
         persist();
         return cable;
     }
-     public Memory registerMemory(String id, String title, double price, int stock,
-                                  int capacityGb, String memoryType, List<String> compatibleConsoleIds) {
-        Memory memory = new Memory(id, title, price, stock, capacityGb, memoryType);
-        if (compatibleConsoleIds != null) {
-            memory.setCompatibleConsoleIds(new ArrayList<>(compatibleConsoleIds));
+
+    public Memory registerMemory(String id, String title, double price, int quantity,
+                                  int gigabytes, String memoryType, List<String> compatibleConsoles) {
+        Memory memory = new Memory(id, title, price, quantity, gigabytes, memoryType);
+        if (compatibleConsoles != null) {
+            memory.setCompatibleConsoles(new ArrayList<>(compatibleConsoles));
         }
-        accessories.add(memory);
+        accesories.add(memory);
         persist();
         return memory;
     }
-      public List<Accessory> listAllAccessories() {
-        return new ArrayList<>(accessories);
+
+    public List<Accesory> listAllAccessories() {
+        return new ArrayList<>(accesories);
     }
- 
-    public List<Accessory> listAccessoriesByType(String type) {
-        List<Accessory> result = new ArrayList<>();
-        for (Accessory accessory : accessories) {
-            if (accessory.getTypeDiscriminator().equalsIgnoreCase(type)) {
-                result.add(accessory);
+
+    public List<Accesory> listAccessoriesByType(String type) {
+        List<Accesory> result = new ArrayList<>();
+        for (Accesory accesory : accesories) {
+            if (accesory.getAccessoryType().equalsIgnoreCase(type)) {
+                result.add(accesory);
             }
         }
         return result;
     }
-     public List<Accessory> findAccessoriesCompatibleWith(String consoleId) {
-        List<Accessory> result = new ArrayList<>();
-        for (Accessory accessory : accessories) {
-            if (accessory.isCompatibleWith(consoleId)) {
-                result.add(accessory);
+
+    public List<Accesory> findAccessoriesCompatibleWith(String consoleId) {
+        List<Accesory> result = new ArrayList<>();
+        for (Accesory accesory : accesories) {
+            if (accesory.isCompatibleWith(consoleId)) {
+                result.add(accesory);
             }
         }
         return result;
     }
-     public Accessory findById(String id) {
-        Optional<Accessory> found = accessories.stream()
+
+    public Accesory findById(String id) {
+        Optional<Accesory> found = accesories.stream()
                 .filter(a -> a.getId().equals(id))
                 .findFirst();
         return found.orElseThrow(() ->
                 new NoSuchElementException("No accessory found with id: " + id));
     }
-       public void updateStock(String accessoryId, int quantity) {
-        Accessory accessory = findById(accessoryId);
-        int newStock = accessory.getStock() + quantity;
-        if (newStock < 0) {
-            throw new IllegalStateException("Insufficient stock for accessory: " + accessoryId);
+
+    public void updateStock(String accesoryId, int quantity) {
+        Accesory accesory = findById(accesoryId);
+        int newQuantity = accesory.getQuantity() + quantity;
+        if (newQuantity < 0) {
+            throw new IllegalStateException("Insufficient stock for accessory: " + accesoryId);
         }
-        accessory.setStock(newStock);
+        accesory.setQuantity(newQuantity);
         persist();
     }
- 
+
     private void persist() {
-        accessoryRepository.saveAll(accessories);
+        accesoryRepository.saveAll(accesories);
     }
 }

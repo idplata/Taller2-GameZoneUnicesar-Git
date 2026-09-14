@@ -1,18 +1,29 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.gamezone.model;
 
-public class Controller extends Accesory{
-    private String  connectionType;
-  
-    public Controller (String id, String title, String price, String stock,String  connectionType) {
-        super(id, title, price, stock);
-        this.connectionType=connectionType;
+public class Controller extends Accesory {
+
+    private String connectionType;
+
+    public Controller(String id, String title, double price, int quantity, String connectionType) {
+        super(id, title, price, quantity);
+        this.connectionType = connectionType;
     }
 
-    public String getConnectionType(){return connectionType;}
-    
-    
+    public String getConnectionType() {
+        return connectionType;
+    }
+
+    public void setConnectionType(String connectionType) {
+        this.connectionType = connectionType;
+    }
+
+    @Override
+    public String getAccessoryType() {
+        return "CONTROLLER";
+    }
+
+    @Override
+    public String getDescription() {
+        return super.getDescription() + " | Connection type: " + connectionType;
+    }
 }

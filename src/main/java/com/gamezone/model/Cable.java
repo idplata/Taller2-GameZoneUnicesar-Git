@@ -1,22 +1,39 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.gamezone.model;
 
+public class Cable extends Accesory {
 
-public class Cable extends Accesory{
-    private String length;
-    private String connectortype;
-  
-    public Cable(String id, String title, String price, String stock, String length, String connectortype) {
-        super(id, title, price, stock);
-        this.length=length;
-        this.connectortype=connectortype;
+    private double length;
+    private String connectorType;
+
+    public Cable(String id, String title, double price, int quantity, double length, String connectorType) {
+        super(id, title, price, quantity);
+        this.length = length;
+        this.connectorType = connectorType;
     }
-    
-    public String getConnectortype(){return connectortype;}
-    public String getLenght(){ return length;}
-    
-    
+
+    public double getLength() {
+        return length;
+    }
+
+    public void setLength(double length) {
+        this.length = length;
+    }
+
+    public String getConnectorType() {
+        return connectorType;
+    }
+
+    public void setConnectorType(String connectorType) {
+        this.connectorType = connectorType;
+    }
+
+    @Override
+    public String getAccessoryType() {
+        return "CABLE";
+    }
+
+    @Override
+    public String getDescription() {
+        return super.getDescription() + " | Length: " + length + "m | Connector: " + connectorType;
+    }
 }

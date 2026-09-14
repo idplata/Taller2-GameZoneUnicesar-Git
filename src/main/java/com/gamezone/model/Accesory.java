@@ -1,30 +1,43 @@
-
 package com.gamezone.model;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public abstract class Accesory {
-    protected String id;
-    protected String title;
-    protected String price;
-    protected String stock; 
-    
-    public Accesory (String id, String title, String price, String stock){
-        this.id = id;
-        this.title = title;
-        this.price = price;
-        this.stock = stock;
+public abstract class Accesory extends Product {
+
+    private List<String> compatibleConsoles;
+
+    public Accesory(String id, String title, double price, int quantity) {
+        super(id, title, price, quantity);
+        this.compatibleConsoles = new ArrayList<>();
     }
-    public String getId() { return id; }
-    public String getTitle() { return title; }
-    public String getPrice() { return price; }
-    public String getStock() { return stock; }
-    
 
+    public List<String> getCompatibleConsoles() {
+        return compatibleConsoles;
+    }
+
+    public void setCompatibleConsoles(List<String> compatibleConsoles) {
+        this.compatibleConsoles = compatibleConsoles;
+    }
+
+    public void addCompatibleConsole(String consoleId) {
+        if (!compatibleConsoles.contains(consoleId)) {
+            compatibleConsoles.add(consoleId);
+        }
+    }
+
+    public boolean isCompatibleWith(String consoleId) {
+        return compatibleConsoles.contains(consoleId);
+    }
+
+    public abstract String getAccessoryType();
+
+    @Override
     public String getDescription() {
-        return "Console: " + getTitle() + 
-               " | Id: " + getId() + 
-               " | Title: " + getTitle() +  
-               " | Price: $" + getPrice() + 
-               " | Stock: " + getStock();
+        return "Id: " + getId() +
+               " | Title: " + getTitle() +
+               " | Price: $" + getPrice() +
+               " | Stock: " + getQuantity() +
+               " | Compatible consoles: " + String.join(",", compatibleConsoles);
     }
 }

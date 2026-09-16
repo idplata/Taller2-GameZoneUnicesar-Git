@@ -1,0 +1,14 @@
+com\gamezone\model\Seller.class
+com\gamezone\persistence\PersonRepository.class
+com\gamezone\model\Person.class
+com\gamezone\ui\main.class
+com\gamezone\model\Product.class
+com\gamezone\persistence\ProductRepository.class
+com\gamezone\service\ProductService.class
+com\gamezone\model\Console.class
+com\gamezone\persistence\SaleRepository.class
+com\gamezone\model\VideoGame.class
+com\gamezone\service\PersonService.class
+com\gamezone\service\SaleService.class
+com\gamezone\model\Sale.class
+com\gamezone\model\Customer.class

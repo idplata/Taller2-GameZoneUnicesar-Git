@@ -4,9 +4,9 @@
 
 | Full Name | Student ID | Role | Module | GitHub Username |
 |-----------|------------|------|--------|-----------------|
-| Irina Danaeth Plata Suarez | [INSERT ID] | Technical Leader | Sales and Integration | idplata |
-| Diego Alejandro Amaya Verdecia | [INSERT ID] | Developer 1 | Products | [username] |
-| Angel Miguel Pirela Bueno | [INSERT ID] | Developer 2 | People | [username] |
+| Irina Danaeth Plata Suarez | 1067605000 | Technical Leader | Sales and Integration | idplata |
+| Diego Alejandro Amaya Verdecia | 1121326454 | Developer 1 | Products | dalejandromaya |
+| Angel Miguel Pirela Bueno | 1114839 | Developer 2 | People | apirelar |
 
 ## Roles and Responsibilities
 
@@ -183,7 +183,7 @@ Each team member maintains a personal AI usage log in `docs/ai-usage/`:
 
 | Role | Name | Email |
 |------|------|-------|
-| Technical Leader | Irina Danaeth Plata Suarez |
+| Technical Leader | Irina Danaeth Plata Suarez |idplata@unicesar.edu.co
 | Developer 1 | Diego Alejandro Amaya Verdecia |
 | Developer 2 | Angel Miguel Pirela Bueno |
 

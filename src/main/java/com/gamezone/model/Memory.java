@@ -1,23 +1,39 @@
 package com.gamezone.model;
 
-import com.gamezone.model.Accesory;
+public class Memory extends Accesory {
 
-public class Memory extends Accesory{
-    private int Gigabytes;
-    private String type;
-  
-    private Memory (String id, String title, String price, String amount, int Gigabytes, String type) {
-        super(id, title, price, amount);
-        this.Gigabytes=Gigabytes;
-        this.type=type;
+    private int gigabytes;
+    private String memoryType;
+
+    public Memory(String id, String title, double price, int quantity, int gigabytes, String memoryType) {
+        super(id, title, price, quantity);
+        this.gigabytes = gigabytes;
+        this.memoryType = memoryType;
     }
 
-    public Memory(String id, String title, String price, String amount) {
-        super(id, title, price, amount);
+    public int getGigabytes() {
+        return gigabytes;
     }
-    
-    public String getType(){return type;}
-    public int getGigabyte(){ return Gigabytes;}
-    
-    
+
+    public void setGigabytes(int gigabytes) {
+        this.gigabytes = gigabytes;
+    }
+
+    public String getMemoryType() {
+        return memoryType;
+    }
+
+    public void setMemoryType(String memoryType) {
+        this.memoryType = memoryType;
+    }
+
+    @Override
+    public String getAccessoryType() {
+        return "MEMORY";
+    }
+
+    @Override
+    public String getDescription() {
+        return super.getDescription() + " | Capacity: " + gigabytes + "GB | Type: " + memoryType;
+    }
 }

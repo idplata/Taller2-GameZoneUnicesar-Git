@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 /**
  * Contiene las reglas de negocio del módulo de personas: registro de
- * clientes, precarga de vendedores, y acceso de lectura a ambas listas.
+ * clientes y acceso de lectura a ambas listas.
  * Esta es la única clase del módulo autorizada para invocar al
  * {@link PersonRepository}; la capa de interfaz de usuario siempre debe
  * pasar por este servicio en lugar de acceder directamente a la persistencia.

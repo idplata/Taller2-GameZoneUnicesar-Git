@@ -15,11 +15,13 @@ public class SaleService {
     private SaleRepository saleRepository;
     private ProductService productService;
     private PersonService personService;
+    private AccesoryService accesoryService;
     
-    public SaleService(SaleRepository saleRepository, ProductService productService,PersonService personService) {
+    public SaleService(SaleRepository saleRepository, ProductService productService,PersonService personService, AccesoryService accesoryService) {
         this.saleRepository = saleRepository;
         this.productService = productService;
         this.personService = personService;
+        this.accesoryService = accesoryService;
     }
     
     public void registerSale(Sale sale){
@@ -32,12 +34,35 @@ public class SaleService {
      
      for(Product p:sale.getproducts()){
       
-         if(!productService.hasEnoughStock(p.getId(), 1)){
+         if (p instanceof Accesory){
+         
+             Accesory accesory = (Accesory) p;
              
-             throw new IllegalArgumentException("Insufficient stock for product: " + p.getTitle());
+            if(!hasEnoughStockAccesory(accesory.getId(), 1)){
+            
+                throw new IllegalArgumentException(
+                
+                        "insufficient stock for accesory: " + accesory.getTitle()
+                        
+                );
+                
+            }
+            accesoryService.updateStock(accesory.getId(),-1);
+         }else{
+             if(productService.hasEnoughStock(p.getId(), 1)){
+             
+                 throw new IllegalArgumentException(
+                 
+                         "Insufficient stock for product: " + p.getTitle()
+                 
+                 );
+             }
+             
+           productService.reduceStock(p.getId(), 1);
+         
          }
      
-         productService.reduceStock(p.getId(), 1);
+        
      
      }
      
@@ -67,6 +92,19 @@ public class SaleService {
     }
     return total;
 }
+    
+    
+    private boolean hasEnoughStockAccesory(String id, int amount){
+    
+    try{
+    
+        Accesory accesory = accesoryService.findById(id);
+        return accesory.getQuantity() >= amount;
+    } catch (Exception e){
+        return false;
+    }
+    
+    }
    }
 
     

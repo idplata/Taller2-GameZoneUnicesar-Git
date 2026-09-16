@@ -16,15 +16,18 @@ public class main {
     private static PersonService personService;
     private static ProductService productService;
     private static SaleService saleService;
+    private static AccesoryService accesoryService;
     private static Scanner input;
 
     public static void main(String[] args) {
             ProductRepository productrepo = new ProductRepository();
             PersonRepository personrepo = new PersonRepository();
             SaleRepository salerepo = new SaleRepository();
+            AccesoryRepository accesoryrepo = new AccesoryRepository();
             personService = new PersonService(personrepo);
             productService = new ProductService();
-            saleService = new SaleService(salerepo, productService, personService);
+            accesoryService = new AccesoryService(accesoryrepo);
+            saleService = new SaleService(salerepo, productService, personService, accesoryService);
             input = new Scanner(System.in);
             
             ShowMainMenu();
@@ -45,11 +48,13 @@ public class main {
                    System.out.println("  4. Register Video Game");
                    System.out.println("  5. Register Console");
                    System.out.println("  6. List Products\n");
+                   System.out.println("--- ACCESORY MANAGEMENT ----");
+                   System.out.println("  7. Accesory Menu");
                    System.out.println("--- SALE MANAGEMENT ---");
-                   System.out.println("  7. Register Sale");
-                   System.out.println("  8. View All Sales");
-                   System.out.println("  9. View Costumer History");
-                   System.out.println(" 10. View Seller History\n");
+                   System.out.println("  8. Register Sale");
+                   System.out.println("  9. View All Sales");
+                   System.out.println(" 10. View Costumer History");
+                   System.out.println(" 11. View Seller History\n");
                    System.out.println(" 0. EXIT ");
                    System.out.println("\n SELECT AN OPTION PLEASE");
                    
@@ -77,15 +82,18 @@ public class main {
                             listproducts();
                             break;
                         case 7:
-                            registersale();
+                            ShowAccesoryMenu();
                             break;
                         case 8:
-                            viewallsales();
+                            registersale();
                             break;
                         case 9:
-                            viewcustomerhistory();
+                            viewallsales();
                             break;
                         case 10:
+                            viewcustomerhistory();
+                            break;
+                        case 11:
                             viewsellerhistory();
                             break;
                         case 0:
@@ -101,19 +109,254 @@ public class main {
                        input.nextLine();
             
                     }
+                   
        }}
+    private static void ShowAccesoryMenu(){
     
+        boolean getout = true;
+        while(getout){
+        System.out.println("--- ACCESORY MANAGEMENT---");
+        System.out.println("  1. Register Cable");
+        System.out.println("  2. Register Controller");
+        System.out.println("  3. Register Memory");
+        System.out.println("  4. List Accesories");
+        System.out.println("  5. List Accesories By Type");
+        System.out.println("  6. Find Accesories Compatible with Console");
+        try {
+            
+            int option = input.nextInt();
+            switch(option){
+            
+                case 1:
+                    registercable();
+                    break;
+                case 2:
+                    registercontroller();
+                    break;
+                case 3: 
+                    registermemory();
+                    break;
+                case 4:
+                    listAccesories();
+                    break;
+                case 5:
+                    listAccesoriesByType();
+                    break;
+                case 6:
+                    FindCompatibleAccesories();
+                    break;
+                case 0:
+                    getout = false;
+                    break;
+                default:
+                    System.out.println("Invalid Option");      }
+        }catch(InputMismatchException e){
+        
+             System.out.println("Please enter a valid option.");
+            input.nextLine();
+
+        }
+        
+        }
+    }
+    
+    private static void registercable(){
+        System.out.println("--- REGISTER CABLE ---");
+        System.out.print("ID: ");
+        String id = input.next();
+        System.out.print("Title: ");
+        String title = input.next();
+        System.out.print("Price: ");
+        double price = input.nextDouble();
+        System.out.print("Quantity: ");
+        int quantity = input.nextInt();
+        System.out.println("Length:");
+        double length = input.nextDouble();
+        System.out.println("Connector Type (HDMI/USB/Optical: ");
+        String connectorType = input.next();
+        
+       try{
+       
+       Cable cable = accesoryService.registerCable(id, title, price, quantity, length, connectorType);
+           System.out.println("Cable registered: " + cable.getTitle());
+       
+       }catch(Exception e){
+           System.out.println("Error: " + e.getMessage());
+       }
+      
+    }
+
+    private static void registercontroller(){
+        System.out.println("--- REGISTER CONTROLLER ---");
+        System.out.print("ID: ");
+        String id = input.next();
+        System.out.print("Title: ");
+        String title = input.next();
+        System.out.print("Price: ");
+        double price = input.nextDouble();
+        System.out.print("Quantity: ");
+        int quantity = input.nextInt();
+        System.out.println("Length:");
+        double length = input.nextDouble();
+        System.out.println("Connector Type (Wired/Wireless: ");
+        String connectorType = input.next();
+    
+        List<String> compatibleConsoles = selectCompatibleConsoles();
+        
+        try{
+            Controller controller = accesoryService.registerController(id, title, price, quantity, connectorType, compatibleConsoles);
+            System.out.println("Controller registered: " + controller.getTitle());
+        }catch(Exception e){
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+    
+    private static void registermemory(){
+        System.out.println("--- REGISTER MEMORY ---");
+        System.out.print("ID: ");
+        String id = input.next();
+        System.out.print("Title: ");
+        String title = input.next();
+        System.out.print("Price: ");
+        double price = input.nextDouble();
+        System.out.print("Quantity: ");
+        int quantity = input.nextInt();
+        System.out.println("Gigabytes: ");
+        int gigabytes = input.nextInt();
+        System.out.println("Memory Type:");
+        String memoryType = input.next();
+        List<String> compatibleConsoles = selectCompatibleConsoles();
+        try{
+        
+            Memory memory = accesoryService.registerMemory(id, title, price, quantity, gigabytes, memoryType, compatibleConsoles);
+            System.out.println("Memory registered: " + memory.getTitle());
+        }catch(Exception e){
+        System.out.println("Error" + e.getMessage());}
+    
+    }
+    
+    private static List<String> selectCompatibleConsoles() {
+        
+        List<String> compatibleConsoles = new ArrayList<>();
+        System.out.println("Select compatible consoles ('done' to finish):");
+    
+        List<Product> products = productService.getAllProducts();
+        boolean hasConsoles = false;
+            for (Product p : products) {
+                if (p instanceof Console) {
+                    System.out.println("   Console ID: " + p.getId() + " | " + p.getTitle());
+                    hasConsoles = true;
+                }
+            }
+    
+        if (!hasConsoles) {
+            System.out.println("   No consoles registered yet.");
+            return compatibleConsoles;
+        }
+    
+        while (true) {
+            
+            System.out.print("Console ID (or 'done'): ");
+            String consoleId = input.next();
+            
+             if (consoleId.equalsIgnoreCase("done")) {
+                break;
+                }
+             
+            Product p = productService.findById(consoleId);
+            
+            if (p instanceof Console) {
+                
+                compatibleConsoles.add(consoleId);
+                System.out.println("   Added: " + p.getTitle());
+            } else {
+            System.out.println("   Console not found.");
+            }
+    }
+    
+            return compatibleConsoles;
+}
+    
+    
+   private static void listAccesories(){
+   
+       System.out.println("--- ALL ACCESORIES ---");
+       List<Accesory> accesories = accesoryService.listAllAccessories();
+       
+       if (accesories.isEmpty()){
+           
+           System.out.println("No accesories registered");
+           
+       }else{
+       
+           for(Accesory a:accesories){
+           
+               System.out.println(" " + a.getDescription());
+           }
+       
+       }
+   
+   } 
+   
+   private static void listAccesoriesByType(){
+   
+       System.out.println("Enter the type (CONTROLLER/CABLE/MEMORY): ");
+       String type= input.next();
+       
+      List<Accesory> accesories = accesoryService.listAccessoriesByType(type);
+      
+      if (accesories.isEmpty()){
+      
+          System.out.println("No accesories found of type: " + type);
+      } else {
+      
+          System.out.println("--- ACCESORIES OF TYPE " + type +"---");
+          for(Accesory a: accesories){
+          
+              System.out.println(" " + a.getDescription());
+          }
+      }
+   
+   }
+   
+   private static void FindCompatibleAccesories(){
+       System.out.println( "ENTER CONSOLE ID: " );
+       String consoleId = input.next();
+       
+       Product console = productService.findById(consoleId);
+       
+       if(!(console instanceof Console)){
+        System.out.println("Console not found");
+        return;
+        }
+       
+       List<Accesory> accesories = accesoryService.findAccessoriesCompatibleWith(consoleId);
+       
+       if(accesories.isEmpty()){
+       
+           System.out.println("There are no compatible accesories with: " + console.getTitle());
+           
+       }else{
+       
+           System.out.println("---COMPATIBLE WITH: " + console.getTitle()+"---");
+           for(Accesory a: accesories){
+           
+               System.out.println(" " + a.getDescription());
+           }
+       }
+   
+   }
     private static void registerCustomer(){
     
         System.out.println("||---REGISTER CUSTOMER---||");
         System.out.println("ID: ");
-        String id = input.nextLine();
+        String id = input.next();
         System.out.println("NAME: ");
-        String name = input.nextLine();
+        String name = input.next();
         System.out.println("PHONE NUMBER: ");
-        String phone = input.nextLine();
+        String phone = input.next();
         System.out.println("EMAIL: ");
-        String email = input.nextLine();
+        String email = input.next();
         
         try{
         
@@ -147,8 +390,7 @@ public class main {
     
     }
     
-    
-    private static void listsellers(){ 
+   private static void listsellers(){ 
        System.out.println("--- SELLERS ---");
        System.out.println("Searching sellers on personService.listSellers()...");
     
@@ -169,19 +411,19 @@ public class main {
     private static void registervideogame(){
         System.out.println("--- REGISTER VIDEO GAME ---");
         System.out.print("ID: ");
-        String id = input.nextLine();
+        String id = input.next();
         System.out.print("Title: ");
-        String title = input.nextLine();
+        String title = input.next();
         System.out.print("Price: ");
         double price = input.nextDouble();
         System.out.print("Quantity: ");
         int quantity = input.nextInt();
         System.out.print("Platform: ");
-        String platform = input.nextLine();
+        String platform = input.next();
         System.out.print("Genre: ");
-        String genre = input.nextLine();
+        String genre = input.next();
         System.out.print("Age Rating: ");
-        String ageRating = input.nextLine();
+        String ageRating = input.next();
     
         try{
           VideoGame game = new VideoGame(id, title, price, quantity, platform, genre, ageRating);
@@ -199,17 +441,17 @@ public class main {
     private static void registerconsole(){
         System.out.println("--- REGISTER CONSOLE ---");
         System.out.print("ID: ");
-        String id = input.nextLine();
+        String id = input.next();
         System.out.print("Title: ");
-        String title = input.nextLine();
+        String title = input.next();
         System.out.print("Price: ");
         double price = input.nextDouble();
         System.out.print("Quantity: ");
         int quantity = input.nextInt();
         System.out.print("Brand: ");
-        String brand = input.nextLine();
+        String brand = input.next();
         System.out.print("Model: ");
-        String model = input.nextLine();
+        String model = input.next();
         System.out.print("Generation: ");
         int generation = input.nextInt();
         
@@ -244,7 +486,7 @@ public class main {
     private static void registersale(){ 
         System.out.println("--- REGISTER SALE ---");
         System.out.print("Customer ID: ");
-        String customerId = input.nextLine();
+        String customerId = input.next();
         Customer customer = personService.findCustomerById(customerId)
                 .orElse(null);
         if (customer == null) {
@@ -253,7 +495,7 @@ public class main {
         }
         System.out.println("  Customer: " + customer.getName());
         System.out.print("Seller ID: ");
-        String sellerId = input.nextLine();
+        String sellerId = input.next();
         Seller seller = personService.findSellerById(sellerId)
                 .orElse(null);
         if (seller == null) {
@@ -264,8 +506,8 @@ public class main {
         
         List<Product> selectedProducts = new ArrayList<>();
         while (true) {
-            System.out.print("Product ID (or 'done' to finish): ");
-            String productId = input.nextLine();
+            System.out.print("Product ID/ Accesory ID(or 'done' to finish): ");
+            String productId = input.next();
             if (productId.equalsIgnoreCase("done")) {
                 break;
             }
@@ -276,6 +518,15 @@ public class main {
                 selectedProducts.add(p);
                 System.out.println("  Added: " + p.getTitle());
             }
+            
+            try {Accesory a = accesoryService.findById(productId);
+                if (a != null) {
+                    selectedProducts.add(a);
+                    System.out.println("  Added accessory: " + a.getTitle());
+            }
+            } catch (Exception e) {
+                    System.out.println("  Item not found.");
+                }
         }
         
         if (selectedProducts.isEmpty()) {
@@ -319,7 +570,7 @@ public class main {
     
     System.out.println("--- CUSTOMER PURCHASE HISTORY ---");
         System.out.print("Customer ID: ");
-        String customerId = input.nextLine();
+        String customerId = input.next();
         
         try {
             List<Sale> sales = saleService.getCustomerHistory(customerId);
@@ -345,7 +596,7 @@ public class main {
     private static void viewsellerhistory(){ 
         System.out.println("--- SELLER SALES HISTORY ---");
         System.out.print("Seller ID: ");
-        String sellerId = input.nextLine();
+        String sellerId = input.next();
         
         try {
             List<Sale> sales = saleService.getSellerHistory(sellerId);
@@ -366,5 +617,8 @@ public class main {
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }
-    }
+    } 
 }
+    
+
+

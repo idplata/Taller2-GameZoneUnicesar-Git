@@ -60,4 +60,28 @@ public class ReturnRepository {
             throw new RuntimeException("No se pudo crear el directorio de datos", e);
         }
     }
+    
+        /*
+     * Guarda la lista completa de devoluciones, sobrescribiendo el
+     * archivo anterior. La escritura se hace de forma atómica: primero
+     * se escribe a un archivo temporal, y solo si eso tiene éxito se
+     * mueve para reemplazar el archivo real, evitando dejar un archivo
+     * corrupto si el proceso se interrumpe.
+     */
+    public void saveAll(List<Return> returns) {
+        Path target = Paths.get(RETURNS_FILE);
+        Path tempFile = Paths.get(RETURNS_FILE + ".tmp");
+ 
+        try (BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(new java.io.FileOutputStream(tempFile.toFile()), StandardCharsets.UTF_8))) {
+            for (Return returnItem : returns) {
+                writer.write(toCsvLine(returnItem));
+                writer.newLine();
+            }
+            writer.flush();
+            Files.move(tempFile, target, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("Error al guardar las devoluciones", e);
+        }
+    }
 }

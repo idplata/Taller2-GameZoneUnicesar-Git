@@ -163,4 +163,12 @@ public class ReturnService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "the product " + productId + " not for sale " + sale.getId()));
     }
+    
+    /*
+     * Genera un identificador simple y secuencial para una nueva
+     * devolución, basado en la cantidad de devoluciones ya registradas.
+     */
+    private String generateReturnId() {
+        return "R" + String.format("%03d", returns.size() + 1);
+    }
 }

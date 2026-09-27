@@ -84,4 +84,31 @@ public class ReturnRepository {
             throw new RuntimeException("Error al guardar las devoluciones", e);
         }
     }
+    
+       /*
+     * Carga la lista de devoluciones desde el archivo de datos,
+     * resolviendo la venta original y los productos devueltos a través
+     * de SaleService y ProductService. Si el archivo no existe todavía,
+     * se devuelve una lista vacía.
+     */
+    public List<Return> loadAll() {
+        List<Return> returns = new ArrayList<>();
+        Path path = Paths.get(RETURNS_FILE);
+        if (!Files.exists(path)) {
+            return returns;
+        }
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new java.io.FileInputStream(RETURNS_FILE), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.isBlank()) {
+                    continue;
+                }
+                returns.add(fromCsvLine(line));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error al cargar las devoluciones", e);
+        }
+        return returns;
+    }
 }

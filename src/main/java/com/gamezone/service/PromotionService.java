@@ -32,4 +32,14 @@ public class PromotionService {
         public List<Promotion> listAllPromotions() {
         return Collections.unmodifiableList(promotions);
     }
+        public List<Promotion> listActivePromotions() {
+        LocalDate today = LocalDate.now();
+        List<Promotion> active = new ArrayList<>();
+        for (Promotion promotion : promotions) {
+            if (promotion.isActive(today)) {
+                active.add(promotion);
+            }
+        }
+        return active;
+    }
 }

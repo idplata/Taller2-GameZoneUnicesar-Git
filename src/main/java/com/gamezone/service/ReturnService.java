@@ -97,4 +97,21 @@ public class ReturnService {
  
         return returnItem;
     }
+    
+    /*
+     * Retorna todas las devoluciones registradas en el sistema.
+     */
+    public List<Return> viewAllReturns() {
+        return Collections.unmodifiableList(returns);
+    }
+ 
+    /*
+     * Filtra las devoluciones cuya venta asociada pertenece al cliente
+     * indicado.
+     */
+    public List<Return> viewReturnsByCustomer(String customerId) {
+        return returns.stream()
+                .filter(returnItem -> returnItem.getSale().getCustomer().getId().equals(customerId))
+                .collect(Collectors.toList());
+    }
 }

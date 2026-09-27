@@ -104,4 +104,28 @@ public class PromotionRepository {
         throw new IllegalArgumentException(
                 "Unknown promotion type: " + promotion.getClass().getSimpleName());
     }
+            private Promotion fromCsvLine(String line) {
+        String[] fields = line.split(SEPARATOR, -1);
+        String type = fields[0];
+        String id = fields[1];
+        String name = fields[2];
+        LocalDate startDate = LocalDate.parse(fields[3]);
+        LocalDate endDate = LocalDate.parse(fields[4]);
+ 
+        switch (type) {
+            case TYPE_PERCENTAGE:
+                double percentage = Double.parseDouble(fields[5]);
+                return new PercentageDiscount(id, name, startDate, endDate, percentage);
+            case TYPE_CATEGORY:
+                double categoryPercentage = Double.parseDouble(fields[5]);
+                String targetCategory = fields[6];
+                return new CategoryDiscount(id, name, startDate, endDate, categoryPercentage, targetCategory);
+            case TYPE_BULK:
+                int minimumQuantity = Integer.parseInt(fields[5]);
+                double bulkPercentage = Double.parseDouble(fields[6]);
+                return new BulkPurchaseDiscount(id, name, startDate, endDate, minimumQuantity, bulkPercentage);
+            default:
+                throw new IllegalArgumentException("Unknown promotion type in file: " + type);
+        }
+    }
 }

@@ -61,7 +61,7 @@ public class ReturnRepository {
         }
     }
     
-        /*
+    /*
      * Guarda la lista completa de devoluciones, sobrescribiendo el
      * archivo anterior. La escritura se hace de forma atómica: primero
      * se escribe a un archivo temporal, y solo si eso tiene éxito se
@@ -85,7 +85,7 @@ public class ReturnRepository {
         }
     }
     
-       /*
+    /*
      * Carga la lista de devoluciones desde el archivo de datos,
      * resolviendo la venta original y los productos devueltos a través
      * de SaleService y ProductService. Si el archivo no existe todavía,
@@ -110,5 +110,28 @@ public class ReturnRepository {
             throw new RuntimeException("Error al cargar las devoluciones", e);
         }
         return returns;
+    }
+    
+    /*
+     * Convierte una devolución en una línea CSV. Como una devolución
+     * puede incluir varios productos, sus identificadores se guardan
+     * separados por coma dentro del mismo campo.
+     */
+    private String toCsvLine(Return returnItem) {
+        StringBuilder productIds = new StringBuilder();
+        for (Product product : returnItem.getReturnedProducts()) {
+            if (productIds.length() > 0) {
+                productIds.append(PRODUCT_ID_SEPARATOR);
+            }
+            productIds.append(product.getId());
+        }
+ 
+        return String.join(FIELD_SEPARATOR,
+                returnItem.getId(),
+                returnItem.getDate().toString(),
+                returnItem.getSale().getId(),
+                productIds.toString(),
+                returnItem.getReason(),
+                String.valueOf(returnItem.getRefundAmount()));
     }
 }

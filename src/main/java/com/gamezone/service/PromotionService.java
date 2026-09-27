@@ -56,4 +56,12 @@ public class PromotionService {
  
         return bestPromotion;
     }
+        public Promotion findById(String id) {
+        for (Promotion promotion : promotions) {
+            if (promotion.getId().equals(id)) {
+                return promotion;
+            }
+        }
+        return null;
+    }
 }

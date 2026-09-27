@@ -64,4 +64,8 @@ public class PromotionService {
         }
         return null;
     }
+        private void addAndSave(Promotion promotion) {
+        promotions.add(promotion);
+        repository.saveAll(promotions);
+    }
 }

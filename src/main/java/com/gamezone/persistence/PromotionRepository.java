@@ -48,4 +48,25 @@ public class PromotionRepository {
             throw new RuntimeException("Error saving promotions", e);
         }
     }
+     
+     public List<Promotion> loadAll() {
+        List<Promotion> promotions = new ArrayList<>();
+        Path path = Paths.get(PROMOTIONS_FILE);
+        if (!Files.exists(path)) {
+            return promotions;
+        }
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new java.io.FileInputStream(PROMOTIONS_FILE), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.isBlank()) {
+                    continue;
+                }
+                promotions.add(fromCsvLine(line));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading promotions", e);
+        }
+        return promotions;
+    }
 }

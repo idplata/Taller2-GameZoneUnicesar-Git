@@ -57,7 +57,7 @@ public class ReturnRepository {
         try {
             Files.createDirectories(Paths.get(DATA_DIRECTORY));
         } catch (IOException e) {
-            throw new RuntimeException("No se pudo crear el directorio de datos", e);
+            throw new RuntimeException("The data directory could not be created.", e);
         }
     }
     
@@ -81,7 +81,7 @@ public class ReturnRepository {
             writer.flush();
             Files.move(tempFile, target, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new RuntimeException("Error al guardar las devoluciones", e);
+            throw new RuntimeException("Error saving returns", e);
         }
     }
     
@@ -107,7 +107,7 @@ public class ReturnRepository {
                 returns.add(fromCsvLine(line));
             }
         } catch (IOException e) {
-            throw new RuntimeException("Error al cargar las devoluciones", e);
+            throw new RuntimeException("Error loading returns", e);
         }
         return returns;
     }
@@ -151,7 +151,7 @@ public class ReturnRepository {
  
         Sale sale = saleService.findSaleById(saleId)
                 .orElseThrow(() -> new RuntimeException(
-                        "No se encontró la venta " + saleId + " referenciada en una devolución guardada"));
+                        "The sale was not found " + saleId + " referenced in a saved return"));
  
         List<Product> returnedProducts = new ArrayList<>();
         for (String productId : productIds) {

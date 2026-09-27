@@ -42,4 +42,18 @@ public class PromotionService {
         }
         return active;
     }
+        public Promotion findBestPromotionFor(Sale sale) {
+        Promotion bestPromotion = null;
+        double bestDiscount = 0.0;
+ 
+        for (Promotion promotion : listActivePromotions()) {
+            double discount = promotion.calculateDiscount(sale);
+            if (discount > bestDiscount) {
+                bestDiscount = discount;
+                bestPromotion = promotion;
+            }
+        }
+ 
+        return bestPromotion;
+    }
 }

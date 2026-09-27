@@ -150,4 +150,17 @@ public class ReturnService {
         return totalSales - totalReturns;
     }
     
+    /*
+     * Busca, dentro de los productos de la venta original, el producto
+     * con el identificador indicado. Si no lo encuentra, significa que
+     * el cliente intenta devolver un producto que no pertenece a esa
+     * venta, así que se rechaza la operación.
+     */
+    private Product findProductInSale(Sale sale, String productId) {
+        return sale.getProducts().stream()
+                .filter(product -> product.getId().equals(productId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "the product " + productId + " not for sale " + sale.getId()));
+    }
 }

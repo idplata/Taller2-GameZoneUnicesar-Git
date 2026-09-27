@@ -43,4 +43,58 @@ public class ReturnService {
         this.productService = productService;
         this.returns = repository.loadAll();
     }
+    
+        /*
+     * Registra una nueva devolución sobre la venta indicada.
+     *
+     * Antes de crear la devolución se aplican tres validaciones, en este
+     * orden:
+     *   1. La venta original debe existir.
+     *   2. La venta debe seguir dentro del plazo de 30 días para
+     *      devoluciones (se reutiliza Sale.canBeReturned(), en lugar de
+     *      calcular la diferencia de fechas aquí de nuevo).
+     *   3. Cada producto que se quiere devolver debe pertenecer
+     *      efectivamente a esa venta.
+     *
+     * Si alguna validación falla, se lanza IllegalArgumentException con
+     * un mensaje claro en español, ya que ese mensaje puede llegar a
+     * mostrarse directamente al usuario final en el menú de consola.
+     *
+     * Si todas las validaciones pasan: se crea la devolución con la
+     * fecha actual, se calcula el monto reembolsado, se incrementa el
+     * stock de cada producto devuelto invocando
+     * ProductService.restoreStock (reutilizando la lógica existente en
+     * lugar de duplicarla), se persiste la lista actualizada de
+     * devoluciones, y se retorna la devolución creada.
+     */
+    public Return registerReturn(String saleId, List<String> productIds, String reason) {
+        Sale sale = saleService.findSaleById(saleId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "There is no sale with the identifier " + saleId));
+ 
+        if (!sale.canBeReturned()) {
+            throw new IllegalArgumentException(
+                    "the sale " + saleId + " The deadline has already passed." + RETURN_WINDOW_DAYS
+                            + " days to register returns");
+        }
+ 
+        List<Product> returnedProducts = new ArrayList<>();
+        for (String productId : productIds) {
+            Product product = findProductInSale(sale, productId);
+            returnedProducts.add(product);
+        }
+ 
+        String returnId = generateReturnId();
+        Return returnItem = new Return(returnId, LocalDate.now(), sale, returnedProducts, reason, 0.0);
+        returnItem.calculateRefundAmount();
+ 
+        for (Product product : returnedProducts) {
+            productService.restoreStock(product.getId(), 1);
+        }
+ 
+        returns.add(returnItem);
+        repository.saveAll(returns);
+ 
+        return returnItem;
+    }
 }

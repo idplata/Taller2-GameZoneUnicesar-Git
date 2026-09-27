@@ -114,4 +114,12 @@ public class ReturnService {
                 .filter(returnItem -> returnItem.getSale().getCustomer().getId().equals(customerId))
                 .collect(Collectors.toList());
     }
+    /*
+     * Filtra las devoluciones asociadas a una venta específica.
+     */
+    public List<Return> viewReturnsBySale(String saleId) {
+        return returns.stream()
+                .filter(returnItem -> returnItem.getSale().getId().equals(saleId))
+                .collect(Collectors.toList());
+    }
 }

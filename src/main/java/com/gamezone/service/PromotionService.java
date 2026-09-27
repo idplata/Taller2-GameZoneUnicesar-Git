@@ -29,4 +29,7 @@ public class PromotionService {
         addAndSave(promotion);
         return promotion;
     }
+        public List<Promotion> listAllPromotions() {
+        return Collections.unmodifiableList(promotions);
+    }
 }

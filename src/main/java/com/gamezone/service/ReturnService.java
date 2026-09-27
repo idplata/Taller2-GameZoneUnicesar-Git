@@ -122,4 +122,32 @@ public class ReturnService {
                 .filter(returnItem -> returnItem.getSale().getId().equals(saleId))
                 .collect(Collectors.toList());
     }
+    
+    /*
+     * Calcula el balance neto de un mes y año indicados: suma el total
+     * de todas las ventas de ese período, le resta la suma de los
+     * montos reembolsados en las devoluciones de ese mismo período, y
+     * retorna el resultado.
+     *
+     * Este reporte se ubica aquí (y no en SaleService ni en un servicio
+     * aparte) porque necesita consultar dos módulos distintos (ventas y
+     * devoluciones); ReturnService ya depende de SaleService, así que es
+     * el punto natural para consolidar ambos totales sin que ninguno de
+     * los dos módulos originales tenga que conocer al otro.
+     */
+    public double generateMonthlyBalance(int month, int year) {
+        double totalSales = saleService.listAllSales().stream()
+                .filter(sale -> sale.getDate().getMonthValue() == month && sale.getDate().getYear() == year)
+                .mapToDouble(Sale::getTotal)
+                .sum();
+ 
+        double totalReturns = returns.stream()
+                .filter(returnItem -> returnItem.getDate().getMonthValue() == month
+                        && returnItem.getDate().getYear() == year)
+                .mapToDouble(Return::getRefundAmount)
+                .sum();
+ 
+        return totalSales - totalReturns;
+    }
+    
 }

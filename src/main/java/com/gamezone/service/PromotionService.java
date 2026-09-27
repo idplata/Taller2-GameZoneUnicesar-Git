@@ -19,9 +19,13 @@ public class PromotionService {
         addAndSave(promotion);
         return promotion;
     }
-      public Promotion registerCategoryDiscount(String id, String name, LocalDate startDate,
-                                               LocalDate endDate, double percentage, String targetCategory) {
+      public Promotion registerCategoryDiscount(String id, String name, LocalDate startDate,LocalDate endDate, double percentage, String targetCategory) {
         Promotion promotion = new CategoryDiscount(id, name, startDate, endDate, percentage, targetCategory);
+        addAndSave(promotion);
+        return promotion;
+    }
+       public Promotion registerBulkPurchaseDiscount(String id, String name, LocalDate startDate,LocalDate endDate, int minimumQuantity, double percentage) {
+        Promotion promotion = new BulkPurchaseDiscount(id, name, startDate, endDate, minimumQuantity, percentage);
         addAndSave(promotion);
         return promotion;
     }

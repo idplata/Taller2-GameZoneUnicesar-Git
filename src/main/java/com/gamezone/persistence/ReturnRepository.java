@@ -134,4 +134,31 @@ public class ReturnRepository {
                 returnItem.getReason(),
                 String.valueOf(returnItem.getRefundAmount()));
     }
+    
+    /*
+     * Interpreta una línea CSV y reconstruye el objeto Return
+     * correspondiente, buscando la venta original y cada producto
+     * devuelto a través de los servicios inyectados.
+     */
+    private Return fromCsvLine(String line) {
+        String[] fields = line.split(FIELD_SEPARATOR, -1);
+        String id = fields[0];
+        LocalDate date = LocalDate.parse(fields[1]);
+        String saleId = fields[2];
+        String[] productIds = fields[3].split(PRODUCT_ID_SEPARATOR, -1);
+        String reason = fields[4];
+        double refundAmount = Double.parseDouble(fields[5]);
+ 
+        Sale sale = saleService.findSaleById(saleId)
+                .orElseThrow(() -> new RuntimeException(
+                        "No se encontró la venta " + saleId + " referenciada en una devolución guardada"));
+ 
+        List<Product> returnedProducts = new ArrayList<>();
+        for (String productId : productIds) {
+            productService.findProductById(productId)
+                    .ifPresent(returnedProducts::add);
+        }
+ 
+        return new Return(id, date, sale, returnedProducts, reason, refundAmount);
+    }
 }

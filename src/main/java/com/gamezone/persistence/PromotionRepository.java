@@ -16,6 +16,19 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * Se encarga de guardar y cargar los datos de Promotion desde y hacia
+ * un archivo CSV plano. Como Promotion es abstracta y tiene tres
+ * subclases concretas con atributos distintos, cada línea empieza con
+ * un discriminador de tipo (PERCENTAGE, CATEGORY o BULK) que indica
+ * cómo debe interpretarse el resto de la línea.
+ *
+ * Esta es la única clase del módulo de promociones autorizada para
+ * acceder al sistema de archivos. Nunca debe ser invocada directamente
+ * desde la capa de interfaz de usuario; todo acceso debe pasar por
+ * PromotionService.
+ */
+
 public class PromotionRepository {
     private static final String DATA_DIRECTORY = "data";
     private static final String PROMOTIONS_FILE = DATA_DIRECTORY + "/promotions.csv";
@@ -24,6 +37,7 @@ public class PromotionRepository {
     private static final String TYPE_CATEGORY = "CATEGORY";
     private static final String TYPE_BULK = "BULK";
     
+        /* Crea el repositorio y se asegura de que exista el directorio de datos. */
     public PromotionRepository() {
         try {
             Files.createDirectories(Paths.get(DATA_DIRECTORY));
@@ -31,7 +45,13 @@ public class PromotionRepository {
             throw new RuntimeException("Could not create data directory", e);
         }
     }
-    
+    /*
+     * Guarda la lista completa de promociones, sobrescribiendo el archivo
+     * anterior. La escritura se hace de forma atómica: primero se escribe
+     * a un archivo temporal, y solo si eso tiene éxito se mueve para
+     * reemplazar el archivo real, evitando dejar un archivo corrupto si
+     * el proceso se interrumpe.
+     */
      public void saveAll(List<Promotion> promotions) {
         Path target = Paths.get(PROMOTIONS_FILE);
         Path tempFile = Paths.get(PROMOTIONS_FILE + ".tmp");
@@ -48,7 +68,12 @@ public class PromotionRepository {
             throw new RuntimeException("Error saving promotions", e);
         }
     }
-     
+     /*
+     * Carga la lista de promociones desde el archivo de datos,
+     * reconstruyendo la subclase concreta correcta de cada línea según
+     * su discriminador de tipo. Si el archivo no existe todavía, se
+     * devuelve una lista vacía.
+     */
      public List<Promotion> loadAll() {
         List<Promotion> promotions = new ArrayList<>();
         Path path = Paths.get(PROMOTIONS_FILE);
@@ -69,7 +94,10 @@ public class PromotionRepository {
         }
         return promotions;
     }
-     
+    /*
+     * Convierte una promoción en una línea CSV, precedida por el
+     * discriminador de tipo que identifica su subclase concreta.
+     */
         private String toCsvLine(Promotion promotion) {
         if (promotion instanceof PercentageDiscount) {
             PercentageDiscount p = (PercentageDiscount) promotion;
@@ -104,7 +132,12 @@ public class PromotionRepository {
         throw new IllegalArgumentException(
                 "Unknown promotion type: " + promotion.getClass().getSimpleName());
     }
-            private Promotion fromCsvLine(String line) {
+    /*
+     * Interpreta una línea CSV y la convierte de vuelta en la subclase
+     * concreta correcta de Promotion, según su discriminador de tipo
+     * inicial.
+     */
+        private Promotion fromCsvLine(String line) {
         String[] fields = line.split(SEPARATOR, -1);
         String type = fields[0];
         String id = fields[1];

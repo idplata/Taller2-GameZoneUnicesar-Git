@@ -69,4 +69,39 @@ public class PromotionRepository {
         }
         return promotions;
     }
+     
+        private String toCsvLine(Promotion promotion) {
+        if (promotion instanceof PercentageDiscount) {
+            PercentageDiscount p = (PercentageDiscount) promotion;
+            return String.join(SEPARATOR,
+                    TYPE_PERCENTAGE,
+                    p.getId(),
+                    p.getName(),
+                    p.getStartDate().toString(),
+                    p.getEndDate().toString(),
+                    String.valueOf(p.getPercentage()));
+        } else if (promotion instanceof CategoryDiscount) {
+            CategoryDiscount c = (CategoryDiscount) promotion;
+            return String.join(SEPARATOR,
+                    TYPE_CATEGORY,
+                    c.getId(),
+                    c.getName(),
+                    c.getStartDate().toString(),
+                    c.getEndDate().toString(),
+                    String.valueOf(c.getPercentage()),
+                    c.getTargetCategory());
+        } else if (promotion instanceof BulkPurchaseDiscount) {
+            BulkPurchaseDiscount b = (BulkPurchaseDiscount) promotion;
+            return String.join(SEPARATOR,
+                    TYPE_BULK,
+                    b.getId(),
+                    b.getName(),
+                    b.getStartDate().toString(),
+                    b.getEndDate().toString(),
+                    String.valueOf(b.getMinimumQuantity()),
+                    String.valueOf(b.getPercentage()));
+        }
+        throw new IllegalArgumentException(
+                "Unknown promotion type: " + promotion.getClass().getSimpleName());
+    }
 }

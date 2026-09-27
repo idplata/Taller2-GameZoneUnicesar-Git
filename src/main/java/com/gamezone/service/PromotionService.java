@@ -14,4 +14,9 @@ public class PromotionService {
         this.promotions = repository.loadAll();
     }
     
+     public Promotion registerPercentageDiscount(String id, String name, LocalDate startDate,LocalDate endDate, double percentage) {
+        Promotion promotion = new PercentageDiscount(id, name, startDate, endDate, percentage);
+        addAndSave(promotion);
+        return promotion;
+    }
 }

@@ -95,15 +95,15 @@ public abstract class Warranty {
      */
      public String generateWarrantyCertificate() {
         StringBuilder certificate = new StringBuilder();
-        certificate.append("========== CERTIFICADO DE GARANTÍA ==========\n");
-        certificate.append("Tipo de garantía : ").append(getWarrantyType()).append("\n");
-        certificate.append("Identificador    : ").append(id).append("\n");
-        certificate.append("Producto         : ").append(product.getTitle()).append("\n");
-        certificate.append("Venta asociada   : ").append(sale.getid()).append("\n");
-        certificate.append("Fecha de inicio  : ").append(startDate).append("\n");
-        certificate.append("Fecha de fin     : ").append(endDate).append("\n");
-        certificate.append("Duración         : ").append(getDurationInMonths()).append(" meses\n");
-        certificate.append(String.format("Costo adicional  : $%.2f%n", getAdditionalCost()));
+        certificate.append("========== WARRANTY CERTIFICATE==========\n");
+        certificate.append("Type of warranty: ").append(getWarrantyType()).append("\n");
+        certificate.append("Identifier    : ").append(id).append("\n");
+        certificate.append("Product         : ").append(product.getTitle()).append("\n");
+        certificate.append("Cross-selling   : ").append(sale.getid()).append("\n");
+        certificate.append("Start date  : ").append(startDate).append("\n");
+        certificate.append("End date     : ").append(endDate).append("\n");
+        certificate.append("Duratin         : ").append(getDurationInMonths()).append(" meses\n");
+        certificate.append(String.format("Additional cost : $%.2f%n", getAdditionalCost()));
         certificate.append("=============================================");
         return certificate.toString();
     }

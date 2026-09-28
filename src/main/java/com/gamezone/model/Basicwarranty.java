@@ -26,7 +26,7 @@ public class BasicWarranty extends Warranty {
     /* Nombre del tipo de garantía mostrado al usuario. */
     @Override
     public String getWarrantyType() {
-        return "Garantía Básica";
+        return "Basic Warranty";
     }
  
     /* La garantía básica no suma ningún costo adicional a la venta. */

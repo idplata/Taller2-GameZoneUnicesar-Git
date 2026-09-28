@@ -110,4 +110,21 @@ public class WarrantyService {
                         && !warranty.getEndDate().isAfter(limit))
                 .collect(Collectors.toList());
     }
+    
+    /*
+     * Agrega una garantía a la lista en memoria y persiste
+     * inmediatamente la lista actualizada.
+     */
+    private void addAndSave(Warranty warranty) {
+        warranties.add(warranty);
+        repository.saveAll(warranties);
+    }
+ 
+    /*
+     * Genera un identificador simple y secuencial para una nueva
+     * garantía, basado en la cantidad de garantías ya registradas.
+     */
+    private String generateWarrantyId() {
+        return "W" + String.format("%03d", warranties.size() + 1);
+    }
 }

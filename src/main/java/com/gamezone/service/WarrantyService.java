@@ -76,4 +76,11 @@ public class WarrantyService {
                 .findFirst()
                 .orElse(null);
     }
+    
+    /*
+     * Retorna todas las garantías registradas en el sistema.
+     */
+    public List<Warranty> listAllWarranties() {
+        return Collections.unmodifiableList(warranties);
+    }
 }

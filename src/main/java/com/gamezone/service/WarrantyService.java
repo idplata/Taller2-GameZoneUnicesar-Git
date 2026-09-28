@@ -6,7 +6,11 @@ import com.gamezone.model.Product;
 import com.gamezone.model.Sale;
 import com.gamezone.model.Warranty;
 import com.gamezone.persistence.WarrantyRepository;
- 
+ import com.gamezone.persistence.SaleRepository;
+import com.gamezone.persistence.WarrantyRecord;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -32,11 +36,15 @@ public class WarrantyService {
     private final List<Warranty> warranties;
  
     /*
-     * Crea el servicio y carga las garantías previamente persistidas.
+     * [A2] Crea el servicio, carga los registros planos del repositorio
+     * y los convierte en objetos Warranty resolviendo la venta y el
+     * producto a partir de sus identificadores.
      */
-    public WarrantyService(WarrantyRepository repository) {
+    public WarrantyService(WarrantyRepository repository, SaleRepository saleRepository,
+                           ProductService productService) {
         this.repository = repository;
-        this.warranties = repository.loadAll();
+        this.warranties = new ArrayList<>();
+        loadWarranties(saleRepository, productService);
     }
         
     /*

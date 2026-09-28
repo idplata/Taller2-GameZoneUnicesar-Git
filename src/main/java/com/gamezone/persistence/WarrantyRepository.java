@@ -144,5 +144,36 @@ public class WarrantyRepository {
                 warranty.getSale().getId(),
                 warranty.getStartDate().toString());
     }
+    
+    /*
+     * Interpreta una línea CSV y reconstruye la subclase concreta
+     * correcta de Warranty, resolviendo el producto y la venta
+     * asociados a través de los servicios inyectados. La fecha de fin
+     * se recalcula automáticamente dentro del constructor de Warranty.
+     */
+    private Warranty fromCsvLine(String line) {
+        String[] fields = line.split(SEPARATOR, -1);
+        String type = fields[0];
+        String id = fields[1];
+        String productId = fields[2];
+        String saleId = fields[3];
+        LocalDate startDate = LocalDate.parse(fields[4]);
+ 
+        Product product = productService.findProductById(productId)
+                .orElseThrow(() -> new RuntimeException(
+                        "Product not found" + productId + " referenced in a stored guarantee"));
+        Sale sale = saleService.findSaleById(saleId)
+                .orElseThrow(() -> new RuntimeException(
+                        "The sale was not found." + saleId + " referenced in a stored guarantee"));
+ 
+        switch (type) {
+            case TYPE_BASIC:
+                return new BasicWarranty(id, product, sale, startDate);
+            case TYPE_EXTENDED:
+                return new ExtendedWarranty(id, product, sale, startDate);
+            default:
+                throw new IllegalArgumentException("Unknown guarantee type in the file: " + type);
+        }
+    }
 }
 

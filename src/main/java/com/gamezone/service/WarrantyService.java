@@ -83,4 +83,15 @@ public class WarrantyService {
     public List<Warranty> listAllWarranties() {
         return Collections.unmodifiableList(warranties);
     }
+    
+    /*
+     * Retorna las garantías que están vigentes hoy (la fecha actual
+     * cae entre la fecha de inicio y la fecha de fin de la garantía).
+     */
+    public List<Warranty> listActiveWarranties() {
+        LocalDate today = LocalDate.now();
+        return warranties.stream()
+                .filter(warranty -> warranty.isActive(today))
+                .collect(Collectors.toList());
+    }
 }

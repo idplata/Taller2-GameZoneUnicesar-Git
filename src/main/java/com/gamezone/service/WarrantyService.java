@@ -118,7 +118,37 @@ public class WarrantyService {
                         && !warranty.getEndDate().isAfter(limit))
                 .collect(Collectors.toList());
     }
-    
+        /*
+     * [A2] Convierte cada WarrantyRecord en la subclase concreta de
+     * Warranty, buscando la venta en SaleRepository y el producto en
+     * ProductService a partir de sus identificadores.
+     */
+    private void loadWarranties(SaleRepository saleRepository, ProductService productService) {
+        Map<String, Sale> salesById = new HashMap<>();
+        for (Sale sale : saleRepository.loadAll()) {
+            salesById.put(sale.getId(), sale);
+        }
+ 
+        for (WarrantyRecord record : repository.loadAll()) {
+            Sale sale = salesById.get(record.getSaleId());
+            if (sale == null) {
+                throw new RuntimeException("The sale was not found" + record.getSaleId()
+                        + " referenced in the warranty" + record.getId());
+            }
+            Product product = productService.findProductById(record.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Product not found "
+                            + record.getProductId() + " referenced in the warranty" + record.getId()));
+ 
+            if (WarrantyRecord.TYPE_BASIC.equals(record.getType())) {
+                warranties.add(new BasicWarranty(record.getId(), product, sale, record.getStartDate()));
+            } else if (WarrantyRecord.TYPE_EXTENDED.equals(record.getType())) {
+                warranties.add(new ExtendedWarranty(record.getId(), product, sale, record.getStartDate()));
+            } else {
+                throw new IllegalArgumentException(
+                        "Unknown guarantee type in the file: " + record.getType());
+            }
+        }
+    }
     /*
      * Agrega una garantía a la lista en memoria y persiste
      * inmediatamente la lista actualizada.

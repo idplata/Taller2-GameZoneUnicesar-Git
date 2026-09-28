@@ -52,7 +52,7 @@ public class WarrantyRepository {
     try {
         Files.createDirectories(Paths.get(DATA_DIRECTORY));
     } catch (IOException e) {
-        throw new RuntimeException("No se pudo crear el directorio de datos", e);
+        throw new RuntimeException("The data directory could not be created.", e);
     }
 }
     
@@ -101,7 +101,7 @@ public class WarrantyRepository {
                 records.add(fromCsvLine(line));
             }
         } catch (IOException e) {
-            throw new RuntimeException("Error al cargar las garantías", e);
+            throw new RuntimeException("Error loging warranties", e);
         }
         return records;
     }

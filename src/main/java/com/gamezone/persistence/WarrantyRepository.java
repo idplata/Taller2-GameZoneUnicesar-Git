@@ -70,7 +70,7 @@ public class WarrantyRepository {
         }
     }
     
-       /*
+    /*
      * Guarda la lista completa de garantías, sobrescribiendo el archivo
      * anterior. La escritura se hace de forma atómica: primero se
      * escribe a un archivo temporal, y solo si eso tiene éxito se mueve
@@ -92,5 +92,33 @@ public class WarrantyRepository {
         } catch (IOException e) {
             throw new RuntimeException("Error al guardar las garantías", e);
         }
+    }
+    
+    /*
+     * Carga la lista de garantías desde el archivo de datos,
+     * reconstruyendo la subclase concreta correcta de cada línea según
+     * su discriminador de tipo, y resolviendo la venta y el producto
+     * asociados a través de los servicios inyectados. Si el archivo no
+     * existe todavía, se devuelve una lista vacía.
+     */
+    public List<Warranty> loadAll() {
+        List<Warranty> warranties = new ArrayList<>();
+        Path path = Paths.get(WARRANTIES_FILE);
+        if (!Files.exists(path)) {
+            return warranties;
+        }
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new java.io.FileInputStream(WARRANTIES_FILE), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.isBlank()) {
+                    continue;
+                }
+                warranties.add(fromCsvLine(line));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error al cargar las garantías", e);
+        }
+        return warranties;
     }
 }

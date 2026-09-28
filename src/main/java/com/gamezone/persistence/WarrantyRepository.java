@@ -70,5 +70,27 @@ public class WarrantyRepository {
         }
     }
     
-    
+       /*
+     * Guarda la lista completa de garantías, sobrescribiendo el archivo
+     * anterior. La escritura se hace de forma atómica: primero se
+     * escribe a un archivo temporal, y solo si eso tiene éxito se mueve
+     * para reemplazar el archivo real, evitando dejar un archivo
+     * corrupto si el proceso se interrumpe.
+     */
+    public void saveAll(List<Warranty> warranties) {
+        Path target = Paths.get(WARRANTIES_FILE);
+        Path tempFile = Paths.get(WARRANTIES_FILE + ".tmp");
+ 
+        try (BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(new java.io.FileOutputStream(tempFile.toFile()), StandardCharsets.UTF_8))) {
+            for (Warranty warranty : warranties) {
+                writer.write(toCsvLine(warranty));
+                writer.newLine();
+            }
+            writer.flush();
+            Files.move(tempFile, target, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("Error al guardar las garantías", e);
+        }
+    }
 }

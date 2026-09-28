@@ -38,8 +38,7 @@ public class WarrantyService {
         this.repository = repository;
         this.warranties = repository.loadAll();
     }
-    
-     
+        
     /*
      * Crea una garantía básica para el producto y la venta indicados,
      * la persiste inmediatamente y la retorna. Se usa cuando una venta
@@ -47,6 +46,20 @@ public class WarrantyService {
      */
     public BasicWarranty assignBasicWarranty(Product product, Sale sale, LocalDate startDate) {
         BasicWarranty warranty = new BasicWarranty(generateWarrantyId(), product, sale, startDate);
+        addAndSave(warranty);
+        return warranty;
+    }
+    
+    /*
+     * Crea una garantía extendida para el producto y la venta
+     * indicados, la persiste inmediatamente y la retorna. Se usa cuando
+     * el vendedor decide ofrecerla opcionalmente; el costo adicional
+     * (10% del precio del producto) lo calcula la propia garantía a
+     * través de getAdditionalCost(), y es responsabilidad de quien
+     * invoque este método sumarlo al total de la venta.
+     */
+    public ExtendedWarranty assignExtendedWarranty(Product product, Sale sale, LocalDate startDate) {
+        ExtendedWarranty warranty = new ExtendedWarranty(generateWarrantyId(), product, sale, startDate);
         addAndSave(warranty);
         return warranty;
     }

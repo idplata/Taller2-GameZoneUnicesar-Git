@@ -94,4 +94,20 @@ public class WarrantyService {
                 .filter(warranty -> warranty.isActive(today))
                 .collect(Collectors.toList());
     }
+    
+    /*
+     * Retorna las garantías cuya fecha de fin está dentro de los
+     * próximos "daysAhead" días a partir de hoy. Se consideran solo las
+     * garantías que todavía no han vencido (fecha de fin no anterior a
+     * hoy), para no incluir garantías que ya expiraron.
+     */
+    public List<Warranty> listWarrantiesExpiringSoon(int daysAhead) {
+        LocalDate today = LocalDate.now();
+        LocalDate limit = today.plusDays(daysAhead);
+ 
+        return warranties.stream()
+                .filter(warranty -> !warranty.getEndDate().isBefore(today)
+                        && !warranty.getEndDate().isAfter(limit))
+                .collect(Collectors.toList());
+    }
 }

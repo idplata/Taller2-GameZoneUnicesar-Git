@@ -72,7 +72,22 @@ public abstract class Warranty {
      * identifica de forma distinta.
      */
     public abstract String getWarrantyType();
+    
+    /*
+     * Retorna el costo adicional que esta garantía suma al total de la
+     * venta. Es abstracto porque la garantía básica no tiene costo y la
+     * extendida sí.
+     */
+    public abstract double getAdditionalCost();
  
+    /*
+     * Indica si la garantía está vigente en la fecha dada: retorna true
+     * si esa fecha está entre la fecha de inicio y la fecha de fin,
+     * ambas inclusive.
+     */
+    public boolean isActive(LocalDate date) {
+        return !date.isBefore(startDate) && !date.isAfter(endDate);
+    }
     /*
      * Genera un certificado de garantía como texto formateado en
      * español, con el detalle de la garantía: tipo, identificador,
@@ -84,7 +99,7 @@ public abstract class Warranty {
         certificate.append("Tipo de garantía : ").append(getWarrantyType()).append("\n");
         certificate.append("Identificador    : ").append(id).append("\n");
         certificate.append("Producto         : ").append(product.getTitle()).append("\n");
-        certificate.append("Venta asociada   : ").append(sale.getId()).append("\n");
+        certificate.append("Venta asociada   : ").append(sale.getid()).append("\n");
         certificate.append("Fecha de inicio  : ").append(startDate).append("\n");
         certificate.append("Fecha de fin     : ").append(endDate).append("\n");
         certificate.append("Duración         : ").append(getDurationInMonths()).append(" meses\n");

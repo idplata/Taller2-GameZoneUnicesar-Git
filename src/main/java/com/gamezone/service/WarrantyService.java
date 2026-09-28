@@ -38,4 +38,16 @@ public class WarrantyService {
         this.repository = repository;
         this.warranties = repository.loadAll();
     }
+    
+     
+    /*
+     * Crea una garantía básica para el producto y la venta indicados,
+     * la persiste inmediatamente y la retorna. Se usa cuando una venta
+     * incluye una consola, sin costo adicional para el cliente.
+     */
+    public BasicWarranty assignBasicWarranty(Product product, Sale sale, LocalDate startDate) {
+        BasicWarranty warranty = new BasicWarranty(generateWarrantyId(), product, sale, startDate);
+        addAndSave(warranty);
+        return warranty;
+    }
 }

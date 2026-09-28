@@ -93,6 +93,18 @@ public class AccesoryService {
         persist();
     }
 
+    /*
+     * [A4] Incrementa el stock de un accesorio al restaurar una devolucion.
+     * Reutiliza updateStock, que ya suma la cantidad al stock actual y
+     * persiste el cambio, en lugar de duplicar esa logica.
+     */
+    public void restoreStock(String accesoryId, int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("The quantity to restore must be greater than zero");
+        }
+        updateStock(accesoryId, quantity);
+    }
+
     private void persist() {
         accesoryRepository.saveAll(accesories);
     }

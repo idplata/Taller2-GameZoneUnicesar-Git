@@ -1,8 +1,10 @@
 package com.gamezone.persistence;
 
+import com.gamezone.model.Accesory;
 import com.gamezone.model.Product;
 import com.gamezone.model.Return;
 import com.gamezone.model.Sale;
+import com.gamezone.service.AccesoryService;
 import com.gamezone.service.ProductService;
 import com.gamezone.service.SaleService;
 
@@ -19,6 +21,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /*
  * Se encarga de guardar y cargar las devoluciones (Return) en el archivo
@@ -30,6 +33,10 @@ import java.util.List;
  * repositorio recibe SaleService y ProductService por constructor: los
  * usa únicamente para buscar la venta y los productos por su
  * identificador durante la carga, nunca para aplicar reglas de negocio.
+ *
+ * [A4] Cambio: también recibe AccesoryService, porque una devolución puede
+ * incluir accesorios. Al cargar, cada identificador de ítem se busca primero
+ * entre los productos y, si no está allí, entre los accesorios.
  *
  * Esta es la única clase del módulo de devoluciones autorizada para
  * acceder al sistema de archivos; todo acceso debe pasar por
@@ -44,6 +51,7 @@ public class ReturnRepository {
  
     private final SaleService saleService;
     private final ProductService productService;
+    private final AccesoryService accesoryService;
     
     
     /*
@@ -51,9 +59,11 @@ public class ReturnRepository {
      * resolver referencias a Sale y Product, y asegurando que exista el
      * directorio de datos.
      */
-    public ReturnRepository(SaleService saleService, ProductService productService) {
+    public ReturnRepository(SaleService saleService, ProductService productService,
+                            AccesoryService accesoryService) {
         this.saleService = saleService;
         this.productService = productService;
+        this.accesoryService = accesoryService;
         try {
             Files.createDirectories(Paths.get(DATA_DIRECTORY));
         } catch (IOException e) {
@@ -155,10 +165,28 @@ public class ReturnRepository {
  
         List<Product> returnedProducts = new ArrayList<>();
         for (String productId : productIds) {
-            productService.findProductById(productId)
-                    .ifPresent(returnedProducts::add);
+            /* [A4] Se busca primero entre los productos y, si no está, entre los accesorios. */
+            Product item = productService.findById(productId);
+            if (item == null) {
+                item = findAccesory(productId);
+            }
+            if (item != null) {
+                returnedProducts.add(item);
+            }
         }
  
         return new Return(id, date, sale, returnedProducts, reason, refundAmount);
+    }
+
+    /*
+     * [A4] Busca un accesorio por su identificador. AccesoryService.findById
+     * lanza NoSuchElementException cuando no existe; aquí eso se traduce a null.
+     */
+    private Accesory findAccesory(String id) {
+        try {
+            return accesoryService.findById(id);
+        } catch (NoSuchElementException e) {
+            return null;
+        }
     }
 }

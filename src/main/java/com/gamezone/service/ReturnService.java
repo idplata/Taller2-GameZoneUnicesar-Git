@@ -1,5 +1,6 @@
 package com.gamezone.service;
 
+import com.gamezone.model.Accesory;
 import com.gamezone.model.Product;
 import com.gamezone.model.Return;
 import com.gamezone.model.Sale;
@@ -31,16 +32,19 @@ public class ReturnService {
     private final ReturnRepository repository;
     private final SaleService saleService;
     private final ProductService productService;
+    private final AccesoryService accesoryService;
     private final List<Return> returns;
  
     /*
      * Crea el servicio, inyectando sus dependencias y cargando las
      * devoluciones previamente persistidas.
      */
-    public ReturnService(ReturnRepository repository, SaleService saleService, ProductService productService) {
+    public ReturnService(ReturnRepository repository, SaleService saleService,
+                         ProductService productService, AccesoryService accesoryService) {
         this.repository = repository;
         this.saleService = saleService;
         this.productService = productService;
+        this.accesoryService = accesoryService;
         this.returns = repository.loadAll();
     }
     
@@ -89,7 +93,7 @@ public class ReturnService {
         returnItem.calculateRefundAmount();
  
         for (Product product : returnedProducts) {
-            productService.restoreStock(product.getId(), 1);
+            restoreItemStock(product);
         }
  
         returns.add(returnItem);
@@ -164,6 +168,20 @@ public class ReturnService {
                         "the product " + productId + " not for sale " + sale.getId()));
     }
     
+    /*
+     * [A4] Restaura el stock de un ítem devuelto delegando en el servicio que
+     * gestiona su inventario: AccesoryService para accesorios y ProductService
+     * para videojuegos y consolas. Así se reutiliza la lógica de cada servicio
+     * en lugar de duplicarla aquí.
+     */
+    private void restoreItemStock(Product item) {
+        if (item instanceof Accesory) {
+            accesoryService.restoreStock(item.getId(), 1);
+        } else {
+            productService.restoreStock(item.getId(), 1);
+        }
+    }
+
     /*
      * Genera un identificador simple y secuencial para una nueva
      * devolución, basado en la cantidad de devoluciones ya registradas.

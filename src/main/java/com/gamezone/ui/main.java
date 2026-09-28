@@ -18,16 +18,19 @@ public class main {
     private static SaleService saleService;
     private static AccesoryService accesoryService;
     private static Scanner input;
+    private static WarrantyService warrantyService;
 
     public static void main(String[] args) {
             ProductRepository productrepo = new ProductRepository();
             PersonRepository personrepo = new PersonRepository();
             SaleRepository salerepo = new SaleRepository();
             AccesoryRepository accesoryrepo = new AccesoryRepository();
+            WarrantyRepository warrantyRepository = new WarrantyRepository();
+            warrantyService =new WarrantyService(warrantyRepository, salerepo, productService);
             personService = new PersonService(personrepo);
-            productService = new ProductService();
             accesoryService = new AccesoryService(accesoryrepo);
-            saleService = new SaleService(salerepo, productService, personService, accesoryService);
+            productService = new ProductService();
+            saleService = new SaleService(salerepo, productService, personService, accesoryService, warrantyService);
             input = new Scanner(System.in);
             
             ShowMainMenu();

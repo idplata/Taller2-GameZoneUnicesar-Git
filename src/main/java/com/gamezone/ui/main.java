@@ -21,22 +21,28 @@ public class main {
     private static WarrantyService warrantyService;
 
     public static void main(String[] args) {
-            ProductRepository productrepo = new ProductRepository();
-            PersonRepository personrepo = new PersonRepository();
-            SaleRepository salerepo = new SaleRepository();
-            AccesoryRepository accesoryrepo = new AccesoryRepository();
-            WarrantyRepository warrantyRepository = new WarrantyRepository();
-            warrantyService =new WarrantyService(warrantyRepository, salerepo, productService);
-            personService = new PersonService(personrepo);
-            accesoryService = new AccesoryService(accesoryrepo);
-            productService = new ProductService();
-            saleService = new SaleService(salerepo, productService, personService, accesoryService, warrantyService);
-            input = new Scanner(System.in);
-            
-            ShowMainMenu();
-            
-            
-    }
+    
+    ProductRepository productrepo = new ProductRepository();
+    PersonRepository personrepo = new PersonRepository();
+    SaleRepository salerepo = new SaleRepository();
+    AccesoryRepository accesoryrepo = new AccesoryRepository();
+    WarrantyRepository warrantyrepo = new WarrantyRepository();
+
+    
+    productService = new ProductService();
+    personService = new PersonService(personrepo);
+    accesoryService = new AccesoryService(accesoryrepo);
+
+    
+    warrantyService = new WarrantyService(warrantyrepo, salerepo, productService);
+
+    
+    saleService = new SaleService(salerepo, productService, personService,
+                                  accesoryService, warrantyService);
+
+    input = new Scanner(System.in);
+    ShowMainMenu();
+}
     
     public static boolean d = true;
     public static void ShowMainMenu(){

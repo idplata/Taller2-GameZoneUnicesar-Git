@@ -1,13 +1,37 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.gamezone.model;
-
-/**
- *
- * @author apire
+ 
+import java.time.LocalDate;
+ 
+/*
+ * Representa la garantía básica: cubre únicamente defectos de fábrica,
+ * dura 6 meses desde la fecha de venta y no tiene costo adicional para
+ * el cliente. Se genera automáticamente cuando una venta incluye una
+ * consola.
  */
-public class Basicwarranty {
+public class BasicWarranty extends Warranty {
+ 
+    private static final int DURATION_IN_MONTHS = 6;
+ 
+    /* Crea una garantía básica a partir de la fecha de inicio indicada. */
+    public BasicWarranty(String id, Product product, Sale sale, LocalDate startDate) {
+        super(id, product, sale, startDate);
+    }
     
+       /* La garantía básica dura 6 meses. */
+    @Override
+    public int getDurationInMonths() {
+        return DURATION_IN_MONTHS;
+    }
+ 
+    /* Nombre del tipo de garantía mostrado al usuario. */
+    @Override
+    public String getWarrantyType() {
+        return "Garantía Básica";
+    }
+ 
+    /* La garantía básica no suma ningún costo adicional a la venta. */
+    @Override
+    public double getAdditionalCost() {
+        return 0.0;
+    }
 }

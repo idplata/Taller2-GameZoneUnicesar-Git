@@ -66,7 +66,7 @@ public class WarrantyRepository {
         try {
             Files.createDirectories(Paths.get(DATA_DIRECTORY));
         } catch (IOException e) {
-            throw new RuntimeException("No se pudo crear el directorio de datos", e);
+            throw new RuntimeException("The data directory could not be created.", e);
         }
     }
     
@@ -90,7 +90,7 @@ public class WarrantyRepository {
             writer.flush();
             Files.move(tempFile, target, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new RuntimeException("Error al guardar las garantías", e);
+            throw new RuntimeException("Error saving warranties", e);
         }
     }
     
@@ -117,8 +117,32 @@ public class WarrantyRepository {
                 warranties.add(fromCsvLine(line));
             }
         } catch (IOException e) {
-            throw new RuntimeException("Error al cargar las garantías", e);
+            throw new RuntimeException("Error loading warranties", e);
         }
         return warranties;
     }
+    
+        /*
+     * Convierte una garantía en una línea CSV, precedida por el
+     * discriminador de tipo que identifica su subclase concreta.
+     */
+    private String toCsvLine(Warranty warranty) {
+        String type;
+        if (warranty instanceof BasicWarranty) {
+            type = TYPE_BASIC;
+        } else if (warranty instanceof ExtendedWarranty) {
+            type = TYPE_EXTENDED;
+        } else {
+            throw new IllegalArgumentException(
+                    "Unknown warranty type: " + warranty.getClass().getSimpleName());
+        }
+ 
+        return String.join(SEPARATOR,
+                type,
+                warranty.getId(),
+                warranty.getProduct().getId(),
+                warranty.getSale().getId(),
+                warranty.getStartDate().toString());
+    }
 }
+

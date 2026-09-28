@@ -2,11 +2,8 @@ package com.gamezone.persistence;
  
 import com.gamezone.model.BasicWarranty;
 import com.gamezone.model.ExtendedWarranty;
-import com.gamezone.model.Product;
-import com.gamezone.model.Sale;
 import com.gamezone.model.Warranty;
-import com.gamezone.service.ProductService;
-import com.gamezone.service.SaleService;
+
  
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -49,26 +46,15 @@ public class WarrantyRepository {
     private static final String WARRANTIES_FILE = DATA_DIRECTORY + "/warranties.csv";
     private static final String SEPARATOR = ";";
  
-    private static final String TYPE_BASIC = "BASIC";
-    private static final String TYPE_EXTENDED = "EXTENDED";
  
-    private final SaleService saleService;
-    private final ProductService productService;
- 
-    /*
-     * Crea el repositorio, guardando las dependencias necesarias para
-     * resolver referencias a Sale y Product, y asegurando que exista el
-     * directorio de datos.
-     */
-    public WarrantyRepository(SaleService saleService, ProductService productService) {
-        this.saleService = saleService;
-        this.productService = productService;
-        try {
-            Files.createDirectories(Paths.get(DATA_DIRECTORY));
-        } catch (IOException e) {
-            throw new RuntimeException("The data directory could not be created.", e);
-        }
+    /* Crea el repositorio y se asegura de que exista el directorio de datos. */
+    public WarrantyRepository() {
+    try {
+        Files.createDirectories(Paths.get(DATA_DIRECTORY));
+    } catch (IOException e) {
+        throw new RuntimeException("The data directory could not be created.", e);
     }
+}
     
     /*
      * Guarda la lista completa de garantías, sobrescribiendo el archivo
@@ -95,17 +81,15 @@ public class WarrantyRepository {
     }
     
     /*
-     * Carga la lista de garantías desde el archivo de datos,
-     * reconstruyendo la subclase concreta correcta de cada línea según
-     * su discriminador de tipo, y resolviendo la venta y el producto
-     * asociados a través de los servicios inyectados. Si el archivo no
-     * existe todavía, se devuelve una lista vacía.
+     * Carga los registros planos del archivo. Si el archivo no existe
+     * todavía, devuelve una lista vacía. No resuelve ventas ni
+     * productos: eso corresponde a WarrantyService.
      */
-    public List<Warranty> loadAll() {
-        List<Warranty> warranties = new ArrayList<>();
+    public List<WarrantyRecord> loadAll() {
+        List<WarrantyRecord> records = new ArrayList<>();
         Path path = Paths.get(WARRANTIES_FILE);
         if (!Files.exists(path)) {
-            return warranties;
+            return records;
         }
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(new java.io.FileInputStream(WARRANTIES_FILE), StandardCharsets.UTF_8))) {
@@ -114,24 +98,24 @@ public class WarrantyRepository {
                 if (line.isBlank()) {
                     continue;
                 }
-                warranties.add(fromCsvLine(line));
+                records.add(fromCsvLine(line));
             }
         } catch (IOException e) {
-            throw new RuntimeException("Error loading warranties", e);
+            throw new RuntimeException("Error loging warranties", e);
         }
-        return warranties;
+        return records;
     }
     
-        /*
+    /*
      * Convierte una garantía en una línea CSV, precedida por el
      * discriminador de tipo que identifica su subclase concreta.
      */
     private String toCsvLine(Warranty warranty) {
         String type;
         if (warranty instanceof BasicWarranty) {
-            type = TYPE_BASIC;
+            type = WarrantyRecord.TYPE_BASIC;
         } else if (warranty instanceof ExtendedWarranty) {
-            type = TYPE_EXTENDED;
+            type = WarrantyRecord.TYPE_EXTENDED;
         } else {
             throw new IllegalArgumentException(
                     "Unknown warranty type: " + warranty.getClass().getSimpleName());
@@ -141,39 +125,14 @@ public class WarrantyRepository {
                 type,
                 warranty.getId(),
                 warranty.getProduct().getId(),
-                warranty.getSale().getId(),
+                warranty.getSale().getid(),
                 warranty.getStartDate().toString());
     }
     
-    /*
-     * Interpreta una línea CSV y reconstruye la subclase concreta
-     * correcta de Warranty, resolviendo el producto y la venta
-     * asociados a través de los servicios inyectados. La fecha de fin
-     * se recalcula automáticamente dentro del constructor de Warranty.
-     */
-    private Warranty fromCsvLine(String line) {
+        /* Interpreta una línea CSV y la convierte en un registro plano. */
+        private WarrantyRecord fromCsvLine(String line) {
         String[] fields = line.split(SEPARATOR, -1);
-        String type = fields[0];
-        String id = fields[1];
-        String productId = fields[2];
-        String saleId = fields[3];
-        LocalDate startDate = LocalDate.parse(fields[4]);
- 
-        Product product = productService.findProductById(productId)
-                .orElseThrow(() -> new RuntimeException(
-                        "Product not found" + productId + " referenced in a stored guarantee"));
-        Sale sale = saleService.findSaleById(saleId)
-                .orElseThrow(() -> new RuntimeException(
-                        "The sale was not found." + saleId + " referenced in a stored guarantee"));
- 
-        switch (type) {
-            case TYPE_BASIC:
-                return new BasicWarranty(id, product, sale, startDate);
-            case TYPE_EXTENDED:
-                return new ExtendedWarranty(id, product, sale, startDate);
-            default:
-                throw new IllegalArgumentException("Unknown guarantee type in the file: " + type);
-        }
+        return new WarrantyRecord(fields[0], fields[1], fields[2], fields[3], LocalDate.parse(fields[4]));
     }
 }
 

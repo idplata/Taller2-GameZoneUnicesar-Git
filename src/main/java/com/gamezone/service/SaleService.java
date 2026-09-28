@@ -16,12 +16,14 @@ public class SaleService {
     private ProductService productService;
     private PersonService personService;
     private AccesoryService accesoryService;
+    private WarrantyService warrantyService;
     
-    public SaleService(SaleRepository saleRepository, ProductService productService,PersonService personService, AccesoryService accesoryService) {
+    public SaleService(SaleRepository saleRepository, ProductService productService,PersonService personService, AccesoryService accesoryService, WarrantyService warrantyService) {
         this.saleRepository = saleRepository;
         this.productService = productService;
         this.personService = personService;
         this.accesoryService = accesoryService;
+        this.warrantyService=warrantyService;
     }
     
     public void registerSale(Sale sale){

@@ -63,4 +63,17 @@ public class WarrantyService {
         addAndSave(warranty);
         return warranty;
     }
+    
+    /*
+     * Busca la garantía asociada a un producto específico dentro de una
+     * venta específica. Retorna null si no existe ninguna garantía
+     * registrada para esa combinación.
+     */
+    public Warranty findWarrantyByProduct(String productId, String saleId) {
+        return warranties.stream()
+                .filter(warranty -> warranty.getProduct().getId().equals(productId)
+                        && warranty.getSale().getId().equals(saleId))
+                .findFirst()
+                .orElse(null);
+    }
 }

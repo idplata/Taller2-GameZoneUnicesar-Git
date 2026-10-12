@@ -7,7 +7,7 @@ package com.gamezone.model;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-public abstract class Promotion implements Serializable {
+public abstract class Promotion{
     
     private static final long serialVersionUID = 1L;
     
@@ -50,7 +50,6 @@ public abstract class Promotion implements Serializable {
     
     public abstract double calculateDiscount(Sale sale);
     
-    public abstract String getPromotionType();
     
     @Override
     public String toString() {

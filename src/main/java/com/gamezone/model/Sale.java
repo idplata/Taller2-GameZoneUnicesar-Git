@@ -58,7 +58,9 @@ public class Sale implements Serializable {
         LocalDate limit = saleDate.plusDays(30);
         return !LocalDate.now().isAfter(limit);
     }
-    
+    public double getTotal() {
+    return calculateprice();
+}
     @Override
     public String toString(){
         

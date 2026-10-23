@@ -129,7 +129,7 @@ public class ReturnRepository {
         return String.join(FIELD_SEPARATOR,
                 returnItem.getId(),
                 returnItem.getDate().toString(),
-                returnItem.getSale().getId(),
+                returnItem.getSale().getid(),
                 productIds.toString(),
                 returnItem.getReason(),
                 String.valueOf(returnItem.getRefundAmount()));

@@ -5,13 +5,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Representa la devolución de uno o más productos de una venta previa.
- * La devolución puede ser parcial: solo contiene los productos que el
- * cliente realmente devuelve, no necesariamente todos los de la venta.
- * <p>
- * Pertenece a la capa de modelo, por lo que no contiene lógica de acceso
- * a archivos.
+/*
+ * Representa la devolución de uno o más productos comprados en una venta
+ * anterior. La devolución puede ser parcial: solo incluye los productos que
+ * el cliente devuelve, no necesariamente todos los de la venta.
+ *
+ * Return NO hereda de Sale: la devolución hace referencia a una venta ya
+ * existente (asociación), pero tiene su propio ciclo de vida, su propio
+ * identificador y su propia fecha. Por eso la venta original se guarda como
+ * referencia y no se ofrece un setter para ella (relación inmutable).
+ *
+ * Esta clase no contiene lógica de acceso a archivos ni reglas que dependan
+ * de otros módulos (plazo de 30 días, pertenencia, stock): eso corresponde a
+ * ReturnService.
  */
 public class Return {
  
@@ -114,16 +120,16 @@ public class Return {
      */
     public String generateReturnReceipt() {
         StringBuilder receipt = new StringBuilder();
-        receipt.append("===== COMPROBANTE DE DEVOLUCIÓN =====\n");
-        receipt.append("Identificador: ").append(id).append("\n");
-        receipt.append("Fecha: ").append(date).append("\n");
-        receipt.append("Venta original: ").append(sale.getid()).append("\n");
-        receipt.append("Productos devueltos:\n");
+        receipt.append("===== RETURN RECEIPT =====\n");
+        receipt.append("Id: ").append(id).append("\n");
+        receipt.append("Date: ").append(date).append("\n");
+        receipt.append("Original Sale: ").append(sale.getid()).append("\n");
+        receipt.append("Returned products:\n");
         for (Product product : returnedProducts) {
             receipt.append(String.format("  - %s ($%,.2f)%n", product.getTitle(), product.getPrice()));
         }
-        receipt.append("Motivo: ").append(reason).append("\n");
-        receipt.append(String.format("Monto reembolsado: $%,.2f%n", refundAmount));
+        receipt.append("Reason: ").append(reason).append("\n");
+        receipt.append(String.format("Reimbursed amount: $%,.2f%n", refundAmount));
         receipt.append("=====================================");
         return receipt.toString();
     }

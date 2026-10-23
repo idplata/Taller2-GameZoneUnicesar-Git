@@ -16,6 +16,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gamezone.model.Promotion;
+import com.gamezone.model.PercentageDiscount;
+import com.gamezone.model.CategoryDiscount;
+import com.gamezone.model.BulkPurchaseDiscount;
+
 /*
  * Se encarga de guardar y cargar los datos de Promotion desde y hacia
  * un archivo CSV plano. Como Promotion es abstracta y tiene tres

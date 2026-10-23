@@ -5,13 +5,13 @@ import com.gamezone.model.Product;
 import com.gamezone.model.Return;
 import com.gamezone.model.Sale;
 import com.gamezone.persistence.ReturnRepository;
- 
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
- 
+
 /*
  * Contiene las reglas de negocio del módulo de devoluciones: registrar
  * una nueva devolución (con sus validaciones de plazo y pertenencia),
@@ -20,10 +20,11 @@ import java.util.stream.Collectors;
  *
  * Esta es la única clase del módulo autorizada para invocar a
  * ReturnRepository. Depende también de SaleService (para validar la
- * venta original y calcular el total de ventas del balance) y de
- * ProductService (para incrementar el stock de los productos
- * devueltos), respetando el sentido de dependencias de la arquitectura
- * en capas.
+ * venta original y calcular el total de ventas del balance),
+ * ProductService (para incrementar el stock de los productos devueltos)
+ * y AccesoryService (para incrementar el stock de los accesorios
+ * devueltos, ajuste A4), respetando el sentido de dependencias de la
+ * arquitectura en capas.
  */
 public class ReturnService {
 
@@ -32,126 +33,149 @@ public class ReturnService {
     private final ReturnRepository repository;
     private final SaleService saleService;
     private final ProductService productService;
-    private final AccesoryService accesoryService;   // NUEVO: para restaurar accesorios
+    private final AccesoryService accesoryService;   // A4: para restaurar accesorios
     private final List<Return> returns;
 
+    /*
+     * Crea el servicio, inyectando sus dependencias y cargando las
+     * devoluciones previamente persistidas.
+     */
     public ReturnService(ReturnRepository repository,
                          SaleService saleService,
                          ProductService productService,
-                         AccesoryService accesoryService) {   // NUEVO parámetro
+                         AccesoryService accesoryService) {
         this.repository = repository;
         this.saleService = saleService;
         this.productService = productService;
-        this.accesoryService = accesoryService;               // NUEVO
+        this.accesoryService = accesoryService;
         this.returns = repository.loadAll();
     }
-    
-        /*
+
+    /*
      * Registra una nueva devolución sobre la venta indicada.
      *
      * Antes de crear la devolución se aplican tres validaciones, en este
      * orden:
      *   1. La venta original debe existir.
      *   2. La venta debe seguir dentro del plazo de 30 días para
-     *      devoluciones (se reutiliza Sale.canBeReturned(), en lugar de
-     *      calcular la diferencia de fechas aquí de nuevo).
+     *      devoluciones.
      *   3. Cada producto que se quiere devolver debe pertenecer
      *      efectivamente a esa venta.
      *
      * Si alguna validación falla, se lanza IllegalArgumentException con
-     * un mensaje claro en español, ya que ese mensaje puede llegar a
-     * mostrarse directamente al usuario final en el menú de consola.
+     * un mensaje claro, ya que ese mensaje puede llegar a mostrarse
+     * directamente al usuario final en el menú de consola.
      *
      * Si todas las validaciones pasan: se crea la devolución con la
      * fecha actual, se calcula el monto reembolsado, se incrementa el
-     * stock de cada producto devuelto invocando
-     * ProductService.restoreStock (reutilizando la lógica existente en
-     * lugar de duplicarla), se persiste la lista actualizada de
-     * devoluciones, y se retorna la devolución creada.
+     * stock de cada ítem devuelto delegando en el servicio
+     * correspondiente (ProductService o AccesoryService, ajuste A4), se
+     * persiste la lista actualizada de devoluciones, y se retorna la
+     * devolución creada.
      */
     public Return registerReturn(String saleId, List<String> productIds, String reason) {
         Sale sale = saleService.findSaleById(saleId)
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "There is no sale with the identifier " + saleId));
- 
-        if (!sale.canBeReturned()) {
+                        "There is no sale with identifier: " + saleId));
+
+        if (!isWithinReturnWindow(sale)) {
             throw new IllegalArgumentException(
-                    "the sale " + saleId + " The deadline has already passed." + RETURN_WINDOW_DAYS
-                            + " days to register returns");
+                    "Sale " + saleId + " exceeded the " + RETURN_WINDOW_DAYS
+                            + " days allowed to register returns");
         }
- 
+
         List<Product> returnedProducts = new ArrayList<>();
         for (String productId : productIds) {
             Product product = findProductInSale(sale, productId);
             returnedProducts.add(product);
         }
- 
+
         String returnId = generateReturnId();
         Return returnItem = new Return(returnId, LocalDate.now(), sale, returnedProducts, reason, 0.0);
         returnItem.calculateRefundAmount();
- 
+
+        // A4: restaurar stock según el tipo del ítem devuelto (producto o accesorio).
         for (Product product : returnedProducts) {
             restoreItemStock(product);
         }
- 
+
         returns.add(returnItem);
         repository.saveAll(returns);
- 
+
         return returnItem;
     }
-    
+
     /*
      * Retorna todas las devoluciones registradas en el sistema.
      */
     public List<Return> viewAllReturns() {
         return Collections.unmodifiableList(returns);
     }
- 
+
     /*
      * Filtra las devoluciones cuya venta asociada pertenece al cliente
      * indicado.
      */
     public List<Return> viewReturnsByCustomer(String customerId) {
         return returns.stream()
-                .filter(returnItem -> returnItem.getSale().getCustomer().getId().equals(customerId))
+                .filter(returnItem -> returnItem.getSale().getcostumer().getId().equals(customerId))
                 .collect(Collectors.toList());
     }
+
     /*
      * Filtra las devoluciones asociadas a una venta específica.
      */
     public List<Return> viewReturnsBySale(String saleId) {
         return returns.stream()
-                .filter(returnItem -> returnItem.getSale().getId().equals(saleId))
+                .filter(returnItem -> returnItem.getSale().getid().equals(saleId))
                 .collect(Collectors.toList());
     }
-    
+
     /*
      * Calcula el balance neto de un mes y año indicados: suma el total
      * de todas las ventas de ese período, le resta la suma de los
      * montos reembolsados en las devoluciones de ese mismo período, y
      * retorna el resultado.
-     *
-     * Este reporte se ubica aquí (y no en SaleService ni en un servicio
-     * aparte) porque necesita consultar dos módulos distintos (ventas y
-     * devoluciones); ReturnService ya depende de SaleService, así que es
-     * el punto natural para consolidar ambos totales sin que ninguno de
-     * los dos módulos originales tenga que conocer al otro.
      */
     public double generateMonthlyBalance(int month, int year) {
-        double totalSales = saleService.listAllSales().stream()
-                .filter(sale -> sale.getDate().getMonthValue() == month && sale.getDate().getYear() == year)
-                .mapToDouble(Sale::getTotal)
+        double totalSales = saleService.getAllSales().stream()
+                .filter(sale -> sale.getdate().getMonthValue() == month
+                        && sale.getdate().getYear() == year)
+                .mapToDouble(Sale::calculateprice)
                 .sum();
- 
+
         double totalReturns = returns.stream()
                 .filter(returnItem -> returnItem.getDate().getMonthValue() == month
                         && returnItem.getDate().getYear() == year)
                 .mapToDouble(Return::getRefundAmount)
                 .sum();
- 
+
         return totalSales - totalReturns;
     }
-    
+
+    /*
+     * Verifica si la venta sigue dentro del plazo de devolución
+     * (30 días calendario desde la fecha de la venta).
+     */
+    private boolean isWithinReturnWindow(Sale sale) {
+        LocalDate saleDate = sale.getdate().toLocalDate();
+        return !LocalDate.now().isAfter(saleDate.plusDays(RETURN_WINDOW_DAYS));
+    }
+
+    /*
+     * Restaura el stock de un ítem devuelto, delegando en el servicio
+     * correspondiente según si el ítem es un accesorio o un producto
+     * regular. Así se evita duplicar la lógica de inventario y se
+     * mantiene ReturnService libre de detalles de almacenamiento por tipo.
+     */
+    private void restoreItemStock(Product product) {
+        if (product instanceof Accesory accesory) {
+            accesoryService.restoreStock(accesory.getId(), 1);
+        } else {
+            productService.restoreStock(product.getId(), 1);
+        }
+    }
+
     /*
      * Busca, dentro de los productos de la venta original, el producto
      * con el identificador indicado. Si no lo encuentra, significa que
@@ -159,28 +183,12 @@ public class ReturnService {
      * venta, así que se rechaza la operación.
      */
     private Product findProductInSale(Sale sale, String productId) {
-        return sale.getProducts().stream()
+        return sale.getproducts().stream()
                 .filter(product -> product.getId().equals(productId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "the product " + productId + " not for sale " + sale.getId()));
+                        "Product " + productId + " does not belong to sale " + sale.getid()));
     }
-    
-/**
- * Restaura el stock de un ítem devuelto, delegando en el servicio
- * correspondiente según si el ítem es un accesorio o un producto regular.
- * Así se evita duplicar la lógica de inventario y se mantiene
- * ReturnService libre de detalles de almacenamiento por tipo.
- *
- * @param product el ítem devuelto (producto o accesorio)
- */
-private void restoreItemStock(Product product) {
-    if (product instanceof Accesory accesory) {
-        accesoryService.restoreStock(accesory.getId(), 1);
-    } else {
-        productService.restoreStock(product.getId(), 1);
-    }
-}
 
     /*
      * Genera un identificador simple y secuencial para una nueva

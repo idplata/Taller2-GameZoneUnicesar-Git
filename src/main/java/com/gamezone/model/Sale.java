@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.gamezone.model;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -52,6 +53,11 @@ public class Sale implements Serializable {
         return sum;
     }
     
+    public boolean canBeReturned() {
+        LocalDate saleDate = date.toLocalDate();
+        LocalDate limit = saleDate.plusDays(30);
+        return !LocalDate.now().isAfter(limit);
+    }
     
     @Override
     public String toString(){

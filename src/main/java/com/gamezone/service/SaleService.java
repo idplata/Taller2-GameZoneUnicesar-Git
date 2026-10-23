@@ -16,23 +16,25 @@ public class SaleService {
     private ProductService productService;
     private PersonService personService;
     private AccesoryService accesoryService;
+    private WarrantyService warrantyService;
     
-    public SaleService(SaleRepository saleRepository, ProductService productService,PersonService personService, AccesoryService accesoryService) {
+    public SaleService(SaleRepository saleRepository, ProductService productService,PersonService personService, AccesoryService accesoryService, WarrantyService warrantyService) {
         this.saleRepository = saleRepository;
         this.productService = productService;
         this.personService = personService;
         this.accesoryService = accesoryService;
+        this.warrantyService=warrantyService;
     }
     
     public void registerSale(Sale sale){
     
-     if(sale.getproducts() == null || sale.getproducts().isEmpty()){
+     if(sale.getProducts() == null || sale.getProducts().isEmpty()){
      
          throw new IllegalArgumentException("A sale must have at least one product. Try Again");
          
      }
      
-     for(Product p:sale.getproducts()){
+     for(Product p:sale.getProducts()){
       
          if (p instanceof Accesory){
          
@@ -66,7 +68,7 @@ public class SaleService {
      
      }
      
-     saleRepository.savesales(sale);
+     saleRepository.saveSales(sale);
     }
     
     
@@ -88,7 +90,7 @@ public class SaleService {
     public double getTotalRevenue() {
     double total = 0;
     for (Sale sale : saleRepository.findAllSales()) {
-        total += sale.calculateprice();
+        total += sale.calculatePrice();
     }
     return total;
 }

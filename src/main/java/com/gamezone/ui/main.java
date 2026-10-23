@@ -18,25 +18,34 @@ public class main {
     private static SaleService saleService;
     private static AccesoryService accesoryService;
     private static Scanner input;
+    private static WarrantyService warrantyService;
 
     public static void main(String[] args) {
-            ProductRepository productrepo = new ProductRepository();
-            PersonRepository personrepo = new PersonRepository();
-            SaleRepository salerepo = new SaleRepository();
-            AccesoryRepository accesoryrepo = new AccesoryRepository();
-            personService = new PersonService(personrepo);
-            productService = new ProductService();
-            accesoryService = new AccesoryService(accesoryrepo);
-            saleService = new SaleService(salerepo, productService, personService, accesoryService);
-            input = new Scanner(System.in);
-            
-            ShowMainMenu();
-            
-            
-    }
+    
+    ProductRepository productrepo = new ProductRepository();
+    PersonRepository personrepo = new PersonRepository();
+    SaleRepository salerepo = new SaleRepository();
+    AccesoryRepository accesoryrepo = new AccesoryRepository();
+    WarrantyRepository warrantyrepo = new WarrantyRepository();
+
+    
+    productService = new ProductService();
+    personService = new PersonService(personrepo);
+    accesoryService = new AccesoryService(accesoryrepo);
+
+    
+    warrantyService = new WarrantyService(warrantyrepo, salerepo, productService);
+
+    
+    saleService = new SaleService(salerepo, productService, personService,
+                                  accesoryService, warrantyService);
+
+    input = new Scanner(System.in);
+    showMainMenu();
+}
     
     public static boolean d = true;
-    public static void ShowMainMenu(){
+    public static void showMainMenu(){
             
                 while (d == true){
                    System.out.println("║        GAMEZONE UNICESAR             ║");
@@ -82,7 +91,7 @@ public class main {
                             listproducts();
                             break;
                         case 7:
-                            ShowAccesoryMenu();
+                            showAccesoryMenu();
                             break;
                         case 8:
                             registersale();
@@ -111,7 +120,7 @@ public class main {
                     }
                    
        }}
-    private static void ShowAccesoryMenu(){
+    private static void showAccesoryMenu(){
     
         boolean getout = true;
         while(getout){
@@ -128,13 +137,13 @@ public class main {
             switch(option){
             
                 case 1:
-                    registercable();
+                    registerCable();
                     break;
                 case 2:
-                    registercontroller();
+                    registerController();
                     break;
                 case 3: 
-                    registermemory();
+                    registerMemory();
                     break;
                 case 4:
                     listAccesories();
@@ -160,7 +169,7 @@ public class main {
         }
     }
     
-    private static void registercable(){
+    private static void registerCable(){
         System.out.println("--- REGISTER CABLE ---");
         System.out.print("ID: ");
         String id = input.next();
@@ -186,7 +195,7 @@ public class main {
       
     }
 
-    private static void registercontroller(){
+    private static void registerController(){
         System.out.println("--- REGISTER CONTROLLER ---");
         System.out.print("ID: ");
         String id = input.next();
@@ -211,7 +220,7 @@ public class main {
         }
     }
     
-    private static void registermemory(){
+    private static void registerMemory(){
         System.out.println("--- REGISTER MEMORY ---");
         System.out.print("ID: ");
         String id = input.next();
@@ -540,7 +549,7 @@ public class main {
         try {
             saleService.registerSale(sale);
             System.out.println("Sale registered successfully!");
-            System.out.println("  Total: $" + sale.calculateprice());
+            System.out.println("  Total: $" + sale.calculatePrice());
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }}
@@ -552,12 +561,12 @@ public class main {
             System.out.println("   No sales registered.");
         } else {
             for (Sale s : sales) {
-                System.out.println("   Sale #" + s.getid()+ 
-                                 "Date: " + s.getdate() +
-                                 "Customer: " + s.getcostumer().getName() +
-                                 "Total: $" + s.calculateprice());
+                System.out.println("   Sale #" + s.getId()+ 
+                                 "Date: " + s.getDate() +
+                                 "Customer: " + s.getCustomer().getName() +
+                                 "Total: $" + s.calculatePrice());
                 System.out.println("      Products:");
-                for (Product p : s.getproducts()) {
+                for (Product p : s.getProducts()) {
                     System.out.println("         - " + p.getTitle() + " ($" + p.getPrice() + ")");
                 }
             }
@@ -582,8 +591,8 @@ public class main {
                 System.out.println("  Total purchases: " + sales.size());
                 double totalSpent = 0;
                 for (Sale s : sales) {
-                    System.out.println("    " + s.getdate() + " | $" + s.calculateprice());
-                    totalSpent += s.calculateprice();
+                    System.out.println("    " + s.getDate() + " | $" + s.calculatePrice());
+                    totalSpent += s.calculatePrice();
                 }
                 System.out.println("  Total spent: $" + totalSpent);
             }
@@ -608,9 +617,9 @@ public class main {
                 System.out.println("  Total sales attended: " + sales.size());
                 double totalSold = 0;
                 for (Sale s : sales) {
-                    System.out.println("    " + s.getdate()+ " | $" + s.calculateprice()+ 
-                                     " | Customer: " + s.getcostumer().getName());
-                    totalSold += s.calculateprice();
+                    System.out.println("    " + s.getDate()+ " | $" + s.calculatePrice()+ 
+                                     " | Customer: " + s.getCustomer().getName());
+                    totalSold += s.calculatePrice();
                 }
                 System.out.println("  Total value sold: $" + totalSold);
             }

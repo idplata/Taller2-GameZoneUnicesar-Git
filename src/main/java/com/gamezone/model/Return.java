@@ -28,24 +28,19 @@ public class Return {
     private final String reason;
     private double refundAmount;
  
-    /**
-     * Crea una devolución.
-     *
-     * @param id               identificador único de la devolución
-     * @param date             fecha en que se registra la devolución
-     * @param sale             venta original a la que pertenecen los productos
-     * @param returnedProducts productos devueltos (al menos uno)
-     * @param reason           motivo de la devolución
-     * @param refundAmount     monto reembolsado al cliente
-     * @throws IllegalArgumentException si algún dato obligatorio falta o es inválido
+    /*
+     * Crea una devolución con todos sus datos. Valida que el identificador, la
+     * fecha, la venta y los productos devueltos existan, y que la lista de
+     * productos no esté vacía, porque una devolución sin productos no tiene
+     * sentido. Los mensajes están en español porque pueden llegar al usuario.
      */
     public Return(String id, LocalDate date, Sale sale,
                   List<Product> returnedProducts, String reason, double refundAmount) {
         if (id == null || id.isBlank()) {
-            throw new IllegalArgumentException("El identificador de la devolución es obligatorio.");
+            throw new IllegalArgumentException("The return identifier is mandatory.");
         }
         if (date == null) {
-            throw new IllegalArgumentException("La fecha de la devolución es obligatoria.");
+            throw new IllegalArgumentException("The return date is mandatory.");
         }
         if (sale == null) {
             throw new IllegalArgumentException("La venta original es obligatoria.");

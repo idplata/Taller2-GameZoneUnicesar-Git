@@ -26,25 +26,23 @@ import java.util.stream.Collectors;
  * en capas.
  */
 public class ReturnService {
-    
+
     private static final int RETURN_WINDOW_DAYS = 30;
- 
+
     private final ReturnRepository repository;
     private final SaleService saleService;
     private final ProductService productService;
-    private final AccesoryService accesoryService;
+    private final AccesoryService accesoryService;   // NUEVO: para restaurar accesorios
     private final List<Return> returns;
- 
-    /*
-     * Crea el servicio, inyectando sus dependencias y cargando las
-     * devoluciones previamente persistidas.
-     */
-    public ReturnService(ReturnRepository repository, SaleService saleService,
-                         ProductService productService, AccesoryService accesoryService) {
+
+    public ReturnService(ReturnRepository repository,
+                         SaleService saleService,
+                         ProductService productService,
+                         AccesoryService accesoryService) {   // NUEVO parámetro
         this.repository = repository;
         this.saleService = saleService;
         this.productService = productService;
-        this.accesoryService = accesoryService;
+        this.accesoryService = accesoryService;               // NUEVO
         this.returns = repository.loadAll();
     }
     

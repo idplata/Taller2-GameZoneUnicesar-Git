@@ -22,6 +22,12 @@ public class BulkPurchaseDiscount extends Promotion {
     public void setPercentage(double percentage) { this.percentage = percentage; }
     
     @Override
+    public String getPromotionType() {
+        return "BULK";
+    }
+    
+    
+    @Override
     public double calculateDiscount(Sale sale) {
         if (sale == null || sale.getProducts().size() < minimumQuantity) {
             return 0;

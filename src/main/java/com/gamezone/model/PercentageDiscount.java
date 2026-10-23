@@ -1,38 +1,40 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.gamezone.model;
+
 import java.time.LocalDate;
 
 /**
- *
- * @author irind
+ * Promotion that applies a percentage discount to the total sale.
  */
 public class PercentageDiscount extends Promotion {
-        private double percentage;
-        
-        public PercentageDiscount(String id, String name, LocalDate startDate, LocalDate endDate, double percentage){
-        
-            super(id,name,startDate,endDate);
-            this.percentage = percentage;
-        }
-        
-        public double getpercentage(){return percentage;}
-        public void setpercentage(double percentage){this.percentage = percentage;}
-        
-        @Override
-        public double calculateDiscount(Sale sale){
-            if (sale == null){
-                return 0;
-            }
-            
-            double subtotal = sale.calculateprice();
-            return subtotal*(percentage/100);
-        }
-       
-        public String getpromotionType(){
-            return "PERCENTAGE";
-        }
     
+    private double percentage;
+    
+    /**
+     * Constructor with all attributes.
+     */
+    public PercentageDiscount(String id, String name, LocalDate startDate, 
+                              LocalDate endDate, double percentage) {
+        super(id, name, startDate, endDate);
+        this.percentage = percentage;
+    }
+    
+    public double getPercentage() { return percentage; }
+    public void setPercentage(double percentage) { this.percentage = percentage; }
+    
+    @Override
+    public double calculateDiscount(Sale sale) {
+        if (sale == null) return 0;
+        double subtotal = sale.calculatePrice();
+        return subtotal * (percentage / 100.0);
+    }
+    
+    @Override
+    public String getPromotionType() {
+        return "PERCENTAGE";
+    }
+    
+    @Override
+    public String toString() {
+        return super.toString() + " [percentage=" + percentage + "%]";
+    }
 }

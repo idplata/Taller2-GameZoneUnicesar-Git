@@ -49,6 +49,7 @@ public abstract class Promotion{
     }
     
     public abstract double calculateDiscount(Sale sale);
+    public abstract String getPromotionType();
     
     
     @Override

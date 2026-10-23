@@ -43,16 +43,16 @@ public class Return {
             throw new IllegalArgumentException("The return date is mandatory.");
         }
         if (sale == null) {
-            throw new IllegalArgumentException("La venta original es obligatoria.");
+            throw new IllegalArgumentException("The original sale is mandatory.");
         }
         if (returnedProducts == null || returnedProducts.isEmpty()) {
-            throw new IllegalArgumentException("Debe devolver al menos un producto.");
+            throw new IllegalArgumentException("You must return at least one product.");
         }
         if (reason == null || reason.isBlank()) {
-            throw new IllegalArgumentException("El motivo de la devolución es obligatorio.");
+            throw new IllegalArgumentException("The reason for the return is mandatory..");
         }
         if (refundAmount < 0) {
-            throw new IllegalArgumentException("El monto reembolsado no puede ser negativo.");
+            throw new IllegalArgumentException("The reimbursed amount cannot be negative..");
         }
         this.id = id;
         this.date = date;
@@ -62,41 +62,35 @@ public class Return {
         this.refundAmount = refundAmount;
     }
  
-    /** @return el identificador de la devolución */
+    
     public String getId() {
         return id;
     }
  
-    /** @return la fecha en que se registró la devolución */
     public LocalDate getDate() {
         return date;
     }
  
-    /** @return la venta original a la que hace referencia la devolución */
     public Sale getSale() {
         return sale;
     }
  
-    /** @return una vista no modificable de los productos devueltos */
     public List<Product> getReturnedProducts() {
         return Collections.unmodifiableList(returnedProducts);
     }
  
-    /** @return el motivo de la devolución */
     public String getReason() {
         return reason;
     }
  
-    /** @return el monto reembolsado al cliente */
     public double getRefundAmount() {
         return refundAmount;
     }
  
-    /**
-     * Suma los precios de los productos devueltos, asigna el resultado al
-     * monto reembolsado y lo retorna.
-     *
-     * @return el monto reembolsado calculado
+    /*
+     * Calcula el monto reembolsado sumando los precios de los productos
+     * devueltos, lo asigna al atributo refundAmount y retorna el valor
+     * calculado.
      */
     public double calculateRefundAmount() {
         double total = 0;
@@ -107,11 +101,10 @@ public class Return {
         return total;
     }
  
-    /**
-     * Genera un comprobante formateado en español con el detalle de la
-     * devolución.
-     *
-     * @return el texto del comprobante
+    /*
+     * Genera el recibo de la devolución como texto en español: identificador,
+     * fecha, referencia a la venta original, productos devueltos con su
+     * precio, motivo y monto reembolsado.
      */
     public String generateReturnReceipt() {
         StringBuilder receipt = new StringBuilder();

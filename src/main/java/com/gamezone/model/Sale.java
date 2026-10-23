@@ -59,7 +59,7 @@ public class Sale implements Serializable {
         return !LocalDate.now().isAfter(limit);
     }
     public double getTotal() {
-    return calculateprice();
+    return calculatePrice();
 }
     @Override
     public String toString(){

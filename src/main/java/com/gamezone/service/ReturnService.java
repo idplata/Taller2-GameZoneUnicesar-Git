@@ -166,19 +166,21 @@ public class ReturnService {
                         "the product " + productId + " not for sale " + sale.getId()));
     }
     
-    /*
-     * [A4] Restaura el stock de un ítem devuelto delegando en el servicio que
-     * gestiona su inventario: AccesoryService para accesorios y ProductService
-     * para videojuegos y consolas. Así se reutiliza la lógica de cada servicio
-     * en lugar de duplicarla aquí.
-     */
-    private void restoreItemStock(Product item) {
-        if (item instanceof Accesory) {
-            accesoryService.restoreStock(item.getId(), 1);
-        } else {
-            productService.restoreStock(item.getId(), 1);
-        }
+/**
+ * Restaura el stock de un ítem devuelto, delegando en el servicio
+ * correspondiente según si el ítem es un accesorio o un producto regular.
+ * Así se evita duplicar la lógica de inventario y se mantiene
+ * ReturnService libre de detalles de almacenamiento por tipo.
+ *
+ * @param product el ítem devuelto (producto o accesorio)
+ */
+private void restoreItemStock(Product product) {
+    if (product instanceof Accesory accesory) {
+        accesoryService.restoreStock(accesory.getId(), 1);
+    } else {
+        productService.restoreStock(product.getId(), 1);
     }
+}
 
     /*
      * Genera un identificador simple y secuencial para una nueva

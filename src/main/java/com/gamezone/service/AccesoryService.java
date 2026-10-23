@@ -93,25 +93,25 @@ public class AccesoryService {
         persist();
     }
 
-   /**
- * Restaura el stock de un accesorio tras una devolución.
- * Incrementa la cantidad del accesorio indicado y persiste el cambio.
- * Es la contraparte de ProductService.restoreStock para el módulo de accesorios.
- *
- * @param accessoryId identificador del accesorio cuyo stock se restaura
- * @param quantity    cantidad de unidades a restaurar (debe ser positiva)
- * @throws NoSuchElementException   si no existe un accesorio con ese id
- * @throws IllegalArgumentException si la cantidad no es positiva
- */
-public void restoreStock(String accessoryId, int quantity) {
-    if (quantity <= 0) {
-        throw new IllegalArgumentException(
-                "La cantidad a restaurar debe ser positiva: " + quantity);
+    /**
+     * Restaura el stock de un accesorio tras una devolución.
+     * Incrementa la cantidad del accesorio indicado y persiste el cambio.
+     * Es la contraparte de ProductService.restoreStock para el módulo de accesorios.
+     *
+     * @param accessoryId identificador del accesorio cuyo stock se restaura
+     * @param quantity    cantidad de unidades a restaurar (debe ser positiva)
+     * @throws NoSuchElementException   si no existe un accesorio con ese id
+     * @throws IllegalArgumentException si la cantidad no es positiva
+     */
+    public void restoreStock(String accessoryId, int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException(
+                    "The quantity to restore must be positive: " + quantity);
+        }
+        Accesory accesory = findById(accessoryId);
+        accesory.setQuantity(accesory.getQuantity() + quantity);
+        persist();
     }
-    Accesory accesory = findById(accessoryId);
-    accesory.setQuantity(accesory.getQuantity() + quantity);
-    persist();
-}
 
     private void persist() {
         accesoryRepository.saveAll(accesories);

@@ -72,7 +72,7 @@ public class WarrantyService {
     public Warranty findWarrantyByProduct(String productId, String saleId) {
         return warranties.stream()
                 .filter(warranty -> warranty.getProduct().getId().equals(productId)
-                        && warranty.getSale().getId().equals(saleId))
+                        && warranty.getSale().getid().equals(saleId))
                 .findFirst()
                 .orElse(null);
     }

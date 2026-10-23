@@ -28,13 +28,13 @@ public class SaleService {
     
     public void registerSale(Sale sale){
     
-     if(sale.getproducts() == null || sale.getproducts().isEmpty()){
+     if(sale.getProducts() == null || sale.getProducts().isEmpty()){
      
          throw new IllegalArgumentException("A sale must have at least one product. Try Again");
          
      }
      
-     for(Product p:sale.getproducts()){
+     for(Product p:sale.getProducts()){
       
          if (p instanceof Accesory){
          
@@ -68,7 +68,7 @@ public class SaleService {
      
      }
      
-     saleRepository.savesales(sale);
+     saleRepository.saveSales(sale);
     }
     
     
@@ -90,7 +90,7 @@ public class SaleService {
     public double getTotalRevenue() {
     double total = 0;
     for (Sale sale : saleRepository.findAllSales()) {
-        total += sale.calculateprice();
+        total += sale.calculatePrice();
     }
     return total;
 }

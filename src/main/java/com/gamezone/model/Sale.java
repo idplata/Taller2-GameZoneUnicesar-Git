@@ -16,32 +16,32 @@ public class Sale implements Serializable {
     private LocalDateTime date;
     private Customer customer;
     private Seller seller;
-    private String saleid;
+    private String saleId;
     private List<Product> products;
     
-    public Sale(String saleid, Customer customer, Seller seller, List<Product> products){
+    public Sale(String saleId, Customer customer, Seller seller, List<Product> products){
         this.date = LocalDateTime.now(); //I used AI for getting this specific function
         this.customer = customer;
-        this.saleid = saleid;
+        this.saleId = saleId;
         this.seller = seller;
         this.products = new ArrayList<>(products); //AI used to detect logic problems
     }
     
-    public String getid(){ return saleid;}
-    public Customer getcostumer(){return customer;}
-    public Seller getseller(){return seller;}
-    public List<Product> getproducts(){return new ArrayList<>(products);}
-    public LocalDateTime getdate(){return date;}
+    public String getId(){ return saleId;}
+    public Customer getCustomer(){return customer;}
+    public Seller getSeller(){return seller;}
+    public List<Product> getProducts(){return new ArrayList<>(products);}
+    public LocalDateTime getDate(){return date;}
     
     //SETTERS
-    public void setid(String saleid){ this.saleid = saleid;}
-    public void setcustomer(Customer customer){this.customer = customer;}
-    public void setseller(Seller seller){this.seller = seller;}
-    public void setproducts(List<Product> products){this.products = new ArrayList<>(products);}
-    public void setdate(LocalDateTime date){this.date = date;}
+    public void setId(String saleId){ this.saleId = saleId;}
+    public void setCustomer(Customer customer){this.customer = customer;}
+    public void setSeller(Seller seller){this.seller = seller;}
+    public void setProducts(List<Product> products){this.products = new ArrayList<>(products);}
+    public void setDate(LocalDateTime date){this.date = date;}
     
     
-    public double calculateprice(){
+    public double calculatePrice(){
     
         double sum = 0;
         for (Product product: products){
@@ -57,7 +57,7 @@ public class Sale implements Serializable {
     public String toString(){
         
         return "Sale"
-                + "id :" + saleid + ", date: " + date + ", total" + calculateprice();
+                + "id :" + saleId + ", date: " + date + ", total" + calculatePrice();
         
     }
 }

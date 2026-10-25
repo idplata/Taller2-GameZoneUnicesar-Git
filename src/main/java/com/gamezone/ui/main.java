@@ -840,6 +840,108 @@ public static void main(String[] args) {
             System.out.println("Please enter valid numbers for the month and year.");
             }
         }
+        private static void showReturnMenu(){
+            boolean back = false;
+            while (!back) {
+                System.out.println("\n--- RETURNS MANAGEMENT ---");
+                System.out.println("  1. Register a return");
+                System.out.println("  2. View all returns");
+                System.out.println("  3. View returns by customer");
+                System.out.println("  4. View returns by sale");
+                System.out.println("  5. View monthly balance");
+                System.out.println("  0. Back to main menu");
+                String text = readLine("Select an option: ");
+                int option;
+                try {
+                    option = Integer.parseInt(text);
+                } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+                continue;
+            }
+            switch (option) {
+                case 1:
+                    registerReturn();
+                    break;
+                case 2:
+                    printReturns(returnService.viewAllReturns(),
+                            "ALL RETURNS", "There are no registered returns.");
+                    break;
+                case 3:
+                    String customerId = readLine("Customer ID: ");
+                    printReturns(returnService.viewReturnsByCustomer(customerId),
+                        "RETURNS FOR CUSTOMER " + customerId,
+                        "This customer has no returns.");
+                    break;
+                case 4:
+                    String saleId = readLine("Sale ID: ");
+                    printReturns(returnService.viewReturnsBySale(saleId),
+                        "RETURNS FOR SALE " + saleId,
+                        "This sale has no returns.");
+                    break;
+                case 5:
+                    showMonthlyBalance();
+                    break;
+                case 0:
+                    back = true;
+                    break;
+                default:
+                    System.out.println("Invalid option.");
+            }
+        }
+    }
+
+    private static void registerReturn(){
+        System.out.println("--- REGISTER RETURN ---");
+        String saleId = readLine("Sale ID: ");
+        Sale sale = saleService.findSaleById(saleId).orElse(null);
+        if (sale == null) {
+            System.out.println("No sale exists with the id " + saleId + ".");
+            return;
+        }
+        if (!sale.canBeReturned()) {
+            System.out.println("Sale " + saleId + " has already exceeded the 30-day return period.");
+            return;
+        }
+        System.out.println("Products in the sale:");
+        for (Product p : sale.getProducts()) {
+            System.out.println("  - [" + p.getId() + "] " + p.getTitle() + " ($" + p.getPrice() + ")");
+        }
+        String line = readLine("IDs of the products to return (separated by commas): ");
+        List<String> productIds = new ArrayList<>();
+        for (String part : line.split(",")) {
+            String productId = part.trim();
+            if (!productId.isEmpty()) {
+                productIds.add(productId);
+            }
+        }
+        if (productIds.isEmpty()) {
+            System.out.println("You must indicate at least one product.");
+            return;
+        }
+        String reason = readLine("Reason for the return: ");
+        try {
+            Return returnItem = returnService.registerReturn(saleId, productIds, reason);
+            System.out.println("Return registered successfully.");
+            System.out.println(returnItem.generateReturnReceipt());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private static void printReturns(List<Return> returns, String title, String emptyMessage){
+        System.out.println("--- " + title + " ---");
+        if (returns.isEmpty()) {
+            System.out.println("  " + emptyMessage);
+            return;
+        }
+        for (Return r : returns) {
+            System.out.println("  [" + r.getId() + "] " + r.getDate()
+                + " | Sale " + r.getSale().getId()
+                + " | " + r.getReturnedProducts().size() + " product(s)"
+                + " | Refund $" + String.format("%.2f", r.getRefundAmount())
+                + " | Reason: " + r.getReason());
+        }
+    }
         
 }
     

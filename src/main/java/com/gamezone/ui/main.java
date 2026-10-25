@@ -7,6 +7,10 @@ import java.util.*;
 import com.gamezone.model.*;
 import com.gamezone.persistence.*;
 import com.gamezone.service.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
+
 
 /**
  *
@@ -19,30 +23,26 @@ public class main {
     private static AccesoryService accesoryService;
     private static Scanner input;
     private static WarrantyService warrantyService;
+    private static PromotionService promotionService;
+public static void main(String[] args) {
+        ProductRepository productrepo = new ProductRepository();
+        PersonRepository personrepo = new PersonRepository();
+        SaleRepository salerepo = new SaleRepository();
+        AccesoryRepository accesoryrepo = new AccesoryRepository();
+        WarrantyRepository warrantyrepo = new WarrantyRepository();
+        PromotionRepository promotionrepo = new PromotionRepository();
 
-    public static void main(String[] args) {
-    
-    ProductRepository productrepo = new ProductRepository();
-    PersonRepository personrepo = new PersonRepository();
-    SaleRepository salerepo = new SaleRepository();
-    AccesoryRepository accesoryrepo = new AccesoryRepository();
-    WarrantyRepository warrantyrepo = new WarrantyRepository();
+        productService = new ProductService();
+        personService = new PersonService(personrepo);
+        accesoryService = new AccesoryService(accesoryrepo);
+        promotionService = new PromotionService(promotionrepo);
+        warrantyService = new WarrantyService(warrantyrepo, salerepo, productService);
 
-    
-    productService = new ProductService();
-    personService = new PersonService(personrepo);
-    accesoryService = new AccesoryService(accesoryrepo);
+        saleService = new SaleService(salerepo, productService, personService, accesoryService, promotionService, warrantyService);
 
-    
-    warrantyService = new WarrantyService(warrantyrepo, salerepo, productService);
-
-    
-    saleService = new SaleService(salerepo, productService, personService,
-                                  accesoryService, warrantyService);
-
-    input = new Scanner(System.in);
-    showMainMenu();
-}
+        input = new Scanner(System.in);
+        showMainMenu();
+    }
     
     public static boolean d = true;
     public static void showMainMenu(){
@@ -63,7 +63,10 @@ public class main {
                    System.out.println("  8. Register Sale");
                    System.out.println("  9. View All Sales");
                    System.out.println(" 10. View Costumer History");
-                   System.out.println(" 11. View Seller History\n");
+                   System.out.println(" 11. View Seller History");
+                   System.out.println(" 12. View Sale Details");
+                   System.out.println("--- PROMOTIONS ---");
+                   System.out.println(" 13. Gestión de promociones");
                    System.out.println(" 0. EXIT ");
                    System.out.println("\n SELECT AN OPTION PLEASE");
                    
@@ -104,6 +107,12 @@ public class main {
                             break;
                         case 11:
                             viewsellerhistory();
+                            break;
+                        case 12:
+                            viewSaleDetail();
+                            break;
+                        case 13:
+                            showPromotionMenu();
                             break;
                         case 0:
                             System.out.println("¡GRACIAS POR USAR GAMEZONE UNICESAR!");
@@ -545,11 +554,10 @@ public class main {
         
         String saleId = "S-" + System.currentTimeMillis();
         Sale sale = new Sale(saleId, customer, seller, selectedProducts);
-        
         try {
             saleService.registerSale(sale);
             System.out.println("Sale registered successfully!");
-            System.out.println("  Total: $" + sale.calculatePrice());
+            System.out.println(sale.generateReceipt());
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }}
@@ -564,7 +572,7 @@ public class main {
                 System.out.println("   Sale #" + s.getId()+ 
                                  "Date: " + s.getDate() +
                                  "Customer: " + s.getCustomer().getName() +
-                                 "Total: $" + s.calculatePrice());
+                                 "Total: $" + s.getTotal());
                 System.out.println("      Products:");
                 for (Product p : s.getProducts()) {
                     System.out.println("         - " + p.getTitle() + " ($" + p.getPrice() + ")");
@@ -591,8 +599,8 @@ public class main {
                 System.out.println("  Total purchases: " + sales.size());
                 double totalSpent = 0;
                 for (Sale s : sales) {
-                    System.out.println("    " + s.getDate() + " | $" + s.calculatePrice());
-                    totalSpent += s.calculatePrice();
+                    System.out.println("    " + s.getDate() + " | $" + s.getTotal());
+                    totalSpent += s.getTotal();
                 }
                 System.out.println("  Total spent: $" + totalSpent);
             }
@@ -617,16 +625,191 @@ public class main {
                 System.out.println("  Total sales attended: " + sales.size());
                 double totalSold = 0;
                 for (Sale s : sales) {
-                    System.out.println("    " + s.getDate()+ " | $" + s.calculatePrice()+ 
+
+                    System.out.println("    " + s.getDate()+ " | $" + s.getTotal()+ 
                                      " | Customer: " + s.getCustomer().getName());
-                    totalSold += s.calculatePrice();
+                    totalSold += s.getTotal();
                 }
                 System.out.println("  Total value sold: $" + totalSold);
             }
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }
-    } 
+    }
+   
+    private static void viewSaleDetail(){
+        System.out.println("--- DETALLE DE VENTA ---");
+        System.out.print("ID de la venta: ");
+        String saleId = input.next();
+        input.nextLine();
+
+        Sale sale = saleService.findSaleById(saleId.trim()).orElse(null);
+        if (sale == null) {
+            System.out.println("No se encontró ninguna venta con el id " + saleId + ".");
+            return;
+        }
+        System.out.println("Fecha    : " + sale.getDate());
+        System.out.println(sale.generateReceipt());
+        }
+        
+    private static void showPromotionMenu(){
+        boolean back = false;
+        while (!back) {
+            System.out.println("\n--- GESTIÓN DE PROMOCIONES ---");
+            System.out.println("  1. Registrar promoción por porcentaje");
+            System.out.println("  2. Registrar promoción por categoría");
+            System.out.println("  3. Registrar promoción por compra al por mayor");
+            System.out.println("  4. Listar todas las promociones");
+            System.out.println("  5. Listar promociones vigentes");
+            System.out.println("  0. Volver al menú principal");
+            String text = readLine("Seleccione una opción: ");
+            int option;
+            try {
+                option = Integer.parseInt(text);
+            } catch (NumberFormatException e) {
+                System.out.println("Ingrese un numero valido.");
+                continue;
+            }
+            switch (option) {
+                case 1:
+                    registerPercentagePromotion();
+                    break;
+                case 2:
+                    registerCategoryPromotion();
+                    break;
+                case 3:
+                    registerBulkPromotion();
+                    break;
+                case 4:
+                    listPromotions(promotionService.listAllPromotions(),
+                            "TODAS LAS PROMOCIONES", "No hay promociones registradas.");
+                    break;
+                case 5:
+                    listPromotions(promotionService.listActivePromotions(),
+                            "PROMOCIONES VIGENTES", "No hay promociones vigentes hoy.");
+                    break;
+                case 0:
+                    back = true;
+                    break;
+                default:
+                    System.out.println("Opción inválida.");
+            }
+        }
+        }
+    
+        private static void registerPercentagePromotion(){
+            System.out.println("--- REGISTRAR PROMOCIÓN POR PORCENTAJE ---");
+            try {
+                String id = readLine("ID: ");
+                String name = readLine("Nombre: ");
+                LocalDate start = readDate("Fecha de inicio (AAAA-MM-DD): ");
+                LocalDate end = readDate("Fecha de fin (AAAA-MM-DD): ");
+                double percentage = readPercentage();
+                promotionService.registerPercentageDiscount(id, name, start, end, percentage);
+                System.out.println("Promoción registrada correctamente.");
+            } catch (IllegalArgumentException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+        
+        private static void registerCategoryPromotion(){
+            System.out.println("--- REGISTRAR PROMOCIÓN POR CATEGORÍA ---");
+            try {
+                String id = readLine("ID: ");
+                String name = readLine("Nombre: ");
+                LocalDate start = readDate("Fecha de inicio (AAAA-MM-DD): ");
+                LocalDate end = readDate("Fecha de fin (AAAA-MM-DD): ");
+                double percentage = readPercentage();
+                String category = readLine("Categoría (VIDEOGAME o CONSOLE): ").toUpperCase();
+                if (!category.equals("VIDEOGAME") && !category.equals("CONSOLE")) {
+                    throw new IllegalArgumentException("La categoría debe ser VIDEOGAME o CONSOLE.");
+                }
+                promotionService.registerCategoryDiscount(id, name, start, end, percentage, category);
+                System.out.println("Promoción registrada correctamente.");
+            } catch (IllegalArgumentException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+        
+        private static void registerBulkPromotion(){
+            System.out.println("--- REGISTRAR PROMOCIÓN POR COMPRA AL POR MAYOR ---");
+            try {
+                String id = readLine("ID: ");
+                String name = readLine("Nombre: ");
+                LocalDate start = readDate("Fecha de inicio (AAAA-MM-DD): ");
+                LocalDate end = readDate("Fecha de fin (AAAA-MM-DD): ");
+                int minimum;
+                try {
+                    minimum = Integer.parseInt(readLine("Cantidad mínima de productos: "));
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("La cantidad mínima debe ser un número entero.");
+                }
+                if (minimum < 1) {
+                    throw new IllegalArgumentException("La cantidad mínima debe ser al menos 1.");
+                }
+                double percentage = readPercentage();
+                promotionService.registerBulkPurchaseDiscount(id, name, start, end, minimum, percentage);
+                System.out.println("Promoción registrada correctamente.");
+            } catch (IllegalArgumentException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+        
+        private static void listPromotions(List<Promotion> promotions, String title, String emptyMessage){
+            System.out.println("--- " + title + " ---");
+            if (promotions.isEmpty()) {
+                System.out.println("  " + emptyMessage);
+                return;
+            }
+            LocalDate today = LocalDate.now();
+            for (Promotion p : promotions) {
+                System.out.println("  [" + p.getId() + "] " + p.getName()
+                        + " | " + describePromotion(p)
+                        + " | " + p.getStartDate() + " a " + p.getEndDate()
+                        + " | " + (p.isActive(today) ? "VIGENTE" : "NO VIGENTE"));
+            }
+        }
+        
+        private static String describePromotion(Promotion p){
+            if (p instanceof PercentageDiscount) {
+                return "Porcentaje " + ((PercentageDiscount) p).getPercentage() + "% sobre el total";
+            } else if (p instanceof CategoryDiscount) {
+                CategoryDiscount c = (CategoryDiscount) p;
+                return "Categoría " + c.getTargetCategory() + " " + c.getPercentage() + "%";
+            } else if (p instanceof BulkPurchaseDiscount) {
+                BulkPurchaseDiscount b = (BulkPurchaseDiscount) p;
+                return "Mayorista: desde " + b.getMinimumQuantity() + " productos, " + b.getPercentage() + "%";
+            }
+            return p.getPromotionType();
+        }
+        
+        private static String readLine(String prompt){
+            System.out.print(prompt);
+            return input.nextLine().trim();
+        }
+        
+        private static LocalDate readDate(String prompt){
+            try {
+                return LocalDate.parse(readLine(prompt));
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("Fecha inválida. Use el formato AAAA-MM-DD (por ejemplo 2026-10-23).");
+            }
+        }
+        
+        private static double readPercentage(){
+            double percentage;
+            try {
+                percentage = Double.parseDouble(readLine("Porcentaje de descuento (1-100): ").replace(',', '.'));
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("El porcentaje debe ser un número.");
+            }
+            if (percentage <= 0 || percentage > 100) {
+                throw new IllegalArgumentException("El porcentaje debe estar entre 0 y 100.");
+            }
+            return percentage;
+        }
+        
+        
 }
     
 

@@ -6,6 +6,7 @@ package com.gamezone.service;
 import com.gamezone.model.*;
 import com.gamezone.persistence.SaleRepository;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -16,14 +17,18 @@ public class SaleService {
     private ProductService productService;
     private PersonService personService;
     private AccesoryService accesoryService;
+    private PromotionService promotionService;
     private WarrantyService warrantyService;
+   
     
-    public SaleService(SaleRepository saleRepository, ProductService productService,PersonService personService, AccesoryService accesoryService, WarrantyService warrantyService) {
+    public SaleService(SaleRepository saleRepository, ProductService productService,PersonService personService, AccesoryService accesoryService, PromotionService promotionService, WarrantyService warrantyService) {
         this.saleRepository = saleRepository;
         this.productService = productService;
         this.personService = personService;
         this.accesoryService = accesoryService;
         this.warrantyService=warrantyService;
+        this.promotionService = promotionService;
+        
     }
     
     public void registerSale(Sale sale){
@@ -51,7 +56,7 @@ public class SaleService {
             }
             accesoryService.updateStock(accesory.getId(),-1);
          }else{
-             if(productService.hasEnoughStock(p.getId(), 1)){
+             if(!productService.hasEnoughStock(p.getId(), 1)){
              
                  throw new IllegalArgumentException(
                  
@@ -67,6 +72,11 @@ public class SaleService {
         
      
      }
+     Promotion best = promotionService.findBestPromotionFor(sale);
+        if (best != null) {
+            sale.setAppliedPromotionName(best.getName());
+            sale.setDiscountAmount(best.calculateDiscount(sale));
+        }
      
      saleRepository.saveSales(sale);
     }
@@ -76,6 +86,12 @@ public class SaleService {
     
         return saleRepository.findAllSales();
     }
+    
+    public Optional<Sale> findSaleById(String saleId) {
+        return saleRepository.findAllSales().stream()
+                .filter(sale -> sale.getId().equals(saleId))
+                .findFirst();
+}
     
     public List<Sale> getCustomerHistory(String customerId){
     
@@ -90,7 +106,8 @@ public class SaleService {
     public double getTotalRevenue() {
     double total = 0;
     for (Sale sale : saleRepository.findAllSales()) {
-        total += sale.calculatePrice();
+
+        total += sale.getTotal();
     }
     return total;
 }

@@ -127,6 +127,16 @@ public class SaleService {
     }
     
     }
+    
+     public double getMonthlySalesTotal(int month, int year) {
+        double total = 0;
+        for (Sale sale : getAllSales()) {
+            if (sale.getDate().getMonthValue() == month && sale.getDate().getYear() == year) {
+                total += sale.getTotal();
+            }
+        }
+        return total;
+    }
    }
 
     

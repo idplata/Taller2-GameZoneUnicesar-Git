@@ -55,7 +55,7 @@ public class SaleService {
             }
             accesoryService.updateStock(accesory.getId(),-1);
          }else{
-             if(productService.hasEnoughStock(p.getId(), 1)){
+             if(!productService.hasEnoughStock(p.getId(), 1)){
              
                  throw new IllegalArgumentException(
                  

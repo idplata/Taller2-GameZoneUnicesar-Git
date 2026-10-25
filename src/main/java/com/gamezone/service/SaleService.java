@@ -6,6 +6,7 @@ package com.gamezone.service;
 import com.gamezone.model.*;
 import com.gamezone.persistence.SaleRepository;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -86,6 +87,12 @@ public class SaleService {
         return saleRepository.findAllSales();
     }
     
+    public Optional<Sale> findSaleById(String saleId) {
+        return saleRepository.findAllSales().stream()
+                .filter(sale -> sale.getId().equals(saleId))
+                .findFirst();
+}
+    
     public List<Sale> getCustomerHistory(String customerId){
     
         return saleRepository.FindSaleByCustomer(customerId);
@@ -99,7 +106,8 @@ public class SaleService {
     public double getTotalRevenue() {
     double total = 0;
     for (Sale sale : saleRepository.findAllSales()) {
-        total += sale.calculatePrice();
+
+        total += sale.getTotal();
     }
     return total;
 }

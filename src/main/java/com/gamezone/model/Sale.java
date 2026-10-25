@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.gamezone.model;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -88,6 +89,12 @@ public class Sale implements Serializable {
             receipt.append("TOTAL    : $").append(String.format("%.2f", getTotal())).append("\n");
             return receipt.toString();
         }
+
+    public boolean canBeReturned() {
+        LocalDate saleDate = date.toLocalDate();
+        LocalDate limit = saleDate.plusDays(30);
+        return !LocalDate.now().isAfter(limit);
+    }
     
     @Override
     public String toString(){

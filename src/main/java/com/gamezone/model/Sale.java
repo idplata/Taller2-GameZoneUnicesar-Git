@@ -27,7 +27,8 @@ public class Sale implements Serializable {
         this.customer = customer;
         this.saleId = saleId;
         this.seller = seller;
-        this.products = new ArrayList<>(products); //AI used to detect logic problems
+        this.products = new ArrayList<>(products);
+        //AI used to detect logic problems
     }
     
     public String getId(){ return saleId;}
@@ -47,17 +48,48 @@ public class Sale implements Serializable {
     public void setDate(LocalDateTime date){this.date = date;}
     
     
-    public double calculatePrice(){
     
+    public void setAppliedPromotionName(String appliedPromotionName) { this.appliedPromotionName = appliedPromotionName; }
+    public void setDiscountAmount(double discountAmount) { this.discountAmount = discountAmount; }
+    
+    
+  
+    public double calculateSubtotal() {
         double sum = 0;
-        for (Product product: products){
-        
-            sum = sum + product.getPrice();
-        
+        for (Product product : products) {
+            sum += product.getPrice();
         }
         return sum;
     }
+
+    public double calculatePrice() {
+        return calculateSubtotal(); 
+    }
+
+
+    public double getTotal() {
+            return calculateSubtotal() - discountAmount;
+       }
     
+    public String generateReceipt() {
+        StringBuilder receipt = new StringBuilder();
+        receipt.append("========== RECIBO DE VENTA ==========\n");
+        receipt.append("Venta    : ").append(saleId).append("\n");
+        receipt.append("Cliente  : ").append(customer.getName()).append("\n");
+        receipt.append("Vendedor : ").append(seller.getName()).append("\n");
+        for (Product product : products) {
+            receipt.append("  - ").append(product.getTitle())
+               .append(" $").append(String.format("%.2f", product.getPrice())).append("\n");
+        }
+        receipt.append("Subtotal : $").append(String.format("%.2f", calculateSubtotal())).append("\n");
+        if (appliedPromotionName != null) {
+            receipt.append("Descuento (").append(appliedPromotionName).append(") : -$")
+               .append(String.format("%.2f", discountAmount)).append("\n");
+        }
+            receipt.append("TOTAL    : $").append(String.format("%.2f", getTotal())).append("\n");
+            return receipt.toString();
+        }
+
     public boolean canBeReturned() {
         LocalDate saleDate = date.toLocalDate();
         LocalDate limit = saleDate.plusDays(30);

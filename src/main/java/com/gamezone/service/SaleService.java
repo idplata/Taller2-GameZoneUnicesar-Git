@@ -16,14 +16,18 @@ public class SaleService {
     private ProductService productService;
     private PersonService personService;
     private AccesoryService accesoryService;
+    private PromotionService promotionService;
     private WarrantyService warrantyService;
+   
     
-    public SaleService(SaleRepository saleRepository, ProductService productService,PersonService personService, AccesoryService accesoryService, WarrantyService warrantyService) {
+    public SaleService(SaleRepository saleRepository, ProductService productService,PersonService personService, AccesoryService accesoryService, PromotionService promotionService, WarrantyService warrantyService) {
         this.saleRepository = saleRepository;
         this.productService = productService;
         this.personService = personService;
         this.accesoryService = accesoryService;
         this.warrantyService=warrantyService;
+        this.promotionService = promotionService;
+        
     }
     
     public void registerSale(Sale sale){
@@ -67,6 +71,11 @@ public class SaleService {
         
      
      }
+     Promotion best = promotionService.findBestPromotionFor(sale);
+        if (best != null) {
+            sale.setAppliedPromotionName(best.getName());
+            sale.setDiscountAmount(best.calculateDiscount(sale));
+        }
      
      saleRepository.saveSales(sale);
     }

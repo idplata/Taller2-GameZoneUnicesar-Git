@@ -7,6 +7,10 @@ import java.util.*;
 import com.gamezone.model.*;
 import com.gamezone.persistence.*;
 import com.gamezone.service.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
+
 
 /**
  *
@@ -59,7 +63,10 @@ public static void main(String[] args) {
                    System.out.println("  8. Register Sale");
                    System.out.println("  9. View All Sales");
                    System.out.println(" 10. View Costumer History");
-                   System.out.println(" 11. View Seller History\n");
+                   System.out.println(" 11. View Seller History");
+                   System.out.println(" 12. View Sale Details");
+                   System.out.println("--- PROMOTIONS ---");
+                   System.out.println(" 13. Gestión de promociones");
                    System.out.println(" 0. EXIT ");
                    System.out.println("\n SELECT AN OPTION PLEASE");
                    
@@ -100,6 +107,12 @@ public static void main(String[] args) {
                             break;
                         case 11:
                             viewsellerhistory();
+                            break;
+                        case 12:
+                            viewSaleDetail();
+                            break;
+                        case 13:
+                            showPromotionMenu();
                             break;
                         case 0:
                             System.out.println("¡GRACIAS POR USAR GAMEZONE UNICESAR!");

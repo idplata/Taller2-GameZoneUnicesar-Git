@@ -87,6 +87,9 @@ public class SaleService {
         return saleRepository.findAllSales();
     }
     
+    public List<Sale> listAllSales() {
+        return getAllSales();
+    }
     public Optional<Sale> findSaleById(String saleId) {
         return saleRepository.findAllSales().stream()
                 .filter(sale -> sale.getId().equals(saleId))

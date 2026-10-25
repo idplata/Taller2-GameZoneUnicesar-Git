@@ -23,6 +23,7 @@ public class main {
     private static AccesoryService accesoryService;
     private static Scanner input;
     private static WarrantyService warrantyService;
+    private static ReturnService returnService;
     private static PromotionService promotionService;
 public static void main(String[] args) {
         ProductRepository productrepo = new ProductRepository();
@@ -31,15 +32,17 @@ public static void main(String[] args) {
         AccesoryRepository accesoryrepo = new AccesoryRepository();
         WarrantyRepository warrantyrepo = new WarrantyRepository();
         PromotionRepository promotionrepo = new PromotionRepository();
+        ReturnRepository returnrepo = new ReturnRepository(saleService,productService);
+        
 
         productService = new ProductService();
         personService = new PersonService(personrepo);
         accesoryService = new AccesoryService(accesoryrepo);
         promotionService = new PromotionService(promotionrepo);
         warrantyService = new WarrantyService(warrantyrepo, salerepo, productService);
-
         saleService = new SaleService(salerepo, productService, personService, accesoryService, promotionService, warrantyService);
-
+        returnService = new ReturnService(returnrepo, saleService, productService);
+        
         input = new Scanner(System.in);
         showMainMenu();
     }

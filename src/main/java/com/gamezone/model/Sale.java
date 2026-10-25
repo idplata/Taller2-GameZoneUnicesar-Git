@@ -13,12 +13,14 @@ import java.util.List;
  * @author irind
  */
 public class Sale implements Serializable {
-    
+    private static final long serialVersionUID = 1L;
     private LocalDateTime date;
     private Customer customer;
     private Seller seller;
     private String saleId;
     private List<Product> products;
+    private String appliedPromotionName;
+    private double discountAmount;
     
     public Sale(String saleId, Customer customer, Seller seller, List<Product> products){
         this.date = LocalDateTime.now(); //I used AI for getting this specific function
@@ -33,6 +35,9 @@ public class Sale implements Serializable {
     public Seller getSeller(){return seller;}
     public List<Product> getProducts(){return new ArrayList<>(products);}
     public LocalDateTime getDate(){return date;}
+
+    public String getAppliedPromotionName() { return appliedPromotionName; }
+    public double getDiscountAmount() { return discountAmount; }
     
     //SETTERS
     public void setId(String saleId){ this.saleId = saleId;}

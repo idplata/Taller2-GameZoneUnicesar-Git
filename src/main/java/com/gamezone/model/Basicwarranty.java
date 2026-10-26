@@ -8,7 +8,7 @@ import java.time.LocalDate;
  * el cliente. Se genera automáticamente cuando una venta incluye una
  * consola.
  */
-public class BasicWarranty extends Warranty {
+public class  BasicWarranty extends Warranty {
  
     private static final int DURATION_IN_MONTHS = 6;
  

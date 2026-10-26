@@ -87,6 +87,9 @@ public class SaleService {
         return saleRepository.findAllSales();
     }
     
+    public List<Sale> listAllSales() {
+        return getAllSales();
+    }
     public Optional<Sale> findSaleById(String saleId) {
         return saleRepository.findAllSales().stream()
                 .filter(sale -> sale.getId().equals(saleId))
@@ -123,6 +126,16 @@ public class SaleService {
         return false;
     }
     
+    }
+    
+     public double getMonthlySalesTotal(int month, int year) {
+        double total = 0;
+        for (Sale sale : getAllSales()) {
+            if (sale.getDate().getMonthValue() == month && sale.getDate().getYear() == year) {
+                total += sale.getTotal();
+            }
+        }
+        return total;
     }
    }
 

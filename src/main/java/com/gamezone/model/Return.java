@@ -111,7 +111,7 @@ public class Return {
         receipt.append("===== RETURN RECEIPT =====\n");
         receipt.append("Id: ").append(id).append("\n");
         receipt.append("Date: ").append(date).append("\n");
-        receipt.append("Original Sale: ").append(sale.getid()).append("\n");
+        receipt.append("Original Sale: ").append(sale.getId()).append("\n");
         receipt.append("Returned products:\n");
         for (Product product : returnedProducts) {
             receipt.append(String.format("  - %s ($%,.2f)%n", product.getTitle(), product.getPrice()));

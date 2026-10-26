@@ -99,7 +99,7 @@ public abstract class Warranty {
         certificate.append("Type of warranty: ").append(getWarrantyType()).append("\n");
         certificate.append("Identifier    : ").append(id).append("\n");
         certificate.append("Product         : ").append(product.getTitle()).append("\n");
-        certificate.append("Cross-selling   : ").append(sale.getid()).append("\n");
+        certificate.append("Cross-selling   : ").append(sale.getId()).append("\n");
         certificate.append("Start date  : ").append(startDate).append("\n");
         certificate.append("End date     : ").append(endDate).append("\n");
         certificate.append("Duratin         : ").append(getDurationInMonths()).append(" meses\n");

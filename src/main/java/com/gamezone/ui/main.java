@@ -23,6 +23,7 @@ public class main {
     private static AccesoryService accesoryService;
     private static Scanner input;
     private static WarrantyService warrantyService;
+    private static ReturnService returnService;
     private static PromotionService promotionService;
 public static void main(String[] args) {
         ProductRepository productrepo = new ProductRepository();
@@ -31,15 +32,17 @@ public static void main(String[] args) {
         AccesoryRepository accesoryrepo = new AccesoryRepository();
         WarrantyRepository warrantyrepo = new WarrantyRepository();
         PromotionRepository promotionrepo = new PromotionRepository();
+        ReturnRepository returnrepo = new ReturnRepository(saleService,productService);
+        
 
         productService = new ProductService();
         personService = new PersonService(personrepo);
         accesoryService = new AccesoryService(accesoryrepo);
         promotionService = new PromotionService(promotionrepo);
         warrantyService = new WarrantyService(warrantyrepo, salerepo, productService);
-
         saleService = new SaleService(salerepo, productService, personService, accesoryService, promotionService, warrantyService);
-
+        returnService = new ReturnService(returnrepo, saleService, productService);
+        
         input = new Scanner(System.in);
         showMainMenu();
     }
@@ -66,7 +69,10 @@ public static void main(String[] args) {
                    System.out.println(" 11. View Seller History");
                    System.out.println(" 12. View Sale Details");
                    System.out.println("--- PROMOTIONS ---");
-                   System.out.println(" 13. Gestión de promociones");
+                   System.out.println(" 13. Promotions management");
+                   System.out.println("--- RETURNS ---");
+                   System.out.println(" 14. Returns management");
+                   System.out.println(" 15. Monthly balance");
                    System.out.println(" 0. EXIT ");
                    System.out.println("\n SELECT AN OPTION PLEASE");
                    
@@ -113,6 +119,12 @@ public static void main(String[] args) {
                             break;
                         case 13:
                             showPromotionMenu();
+                            break;
+                        case 14:
+                            showReturnMenu();
+                            break;
+                        case 15:
+                            showMonthlyBalance();
                             break;
                         case 0:
                             System.out.println("¡GRACIAS POR USAR GAMEZONE UNICESAR!");
@@ -638,36 +650,36 @@ public static void main(String[] args) {
     }
    
     private static void viewSaleDetail(){
-        System.out.println("--- DETALLE DE VENTA ---");
-        System.out.print("ID de la venta: ");
+        System.out.println("--- SALE DETAIL ---");
+        System.out.print("Sale ID: ");
         String saleId = input.next();
         input.nextLine();
 
         Sale sale = saleService.findSaleById(saleId.trim()).orElse(null);
         if (sale == null) {
-            System.out.println("No se encontró ninguna venta con el id " + saleId + ".");
+            System.out.println("No sale was found with the id " + saleId + ".");
             return;
         }
-        System.out.println("Fecha    : " + sale.getDate());
+        System.out.println("Date     : " + sale.getDate());
         System.out.println(sale.generateReceipt());
-        }
-        
+    }
+
     private static void showPromotionMenu(){
         boolean back = false;
         while (!back) {
-            System.out.println("\n--- GESTIÓN DE PROMOCIONES ---");
-            System.out.println("  1. Registrar promoción por porcentaje");
-            System.out.println("  2. Registrar promoción por categoría");
-            System.out.println("  3. Registrar promoción por compra al por mayor");
-            System.out.println("  4. Listar todas las promociones");
-            System.out.println("  5. Listar promociones vigentes");
-            System.out.println("  0. Volver al menú principal");
-            String text = readLine("Seleccione una opción: ");
+            System.out.println("\n--- PROMOTIONS MANAGEMENT ---");
+            System.out.println("  1. Register percentage promotion");
+            System.out.println("  2. Register category promotion");
+            System.out.println("  3. Register bulk purchase promotion");
+            System.out.println("  4. List all promotions");
+            System.out.println("  5. List active promotions");
+            System.out.println("  0. Back to main menu");
+            String text = readLine("Select an option: ");
             int option;
             try {
                 option = Integer.parseInt(text);
             } catch (NumberFormatException e) {
-                System.out.println("Ingrese un numero valido.");
+                System.out.println("Please enter a valid number.");
                 continue;
             }
             switch (option) {
@@ -682,103 +694,103 @@ public static void main(String[] args) {
                     break;
                 case 4:
                     listPromotions(promotionService.listAllPromotions(),
-                            "TODAS LAS PROMOCIONES", "No hay promociones registradas.");
+                        "ALL PROMOTIONS", "There are no registered promotions.");
                     break;
                 case 5:
                     listPromotions(promotionService.listActivePromotions(),
-                            "PROMOCIONES VIGENTES", "No hay promociones vigentes hoy.");
+                        "ACTIVE PROMOTIONS", "There are no active promotions today.");
                     break;
                 case 0:
                     back = true;
                     break;
                 default:
-                    System.out.println("Opción inválida.");
+                    System.out.println("Invalid option.");
             }
         }
+    }
+
+    private static void registerPercentagePromotion(){
+        System.out.println("--- REGISTER PERCENTAGE PROMOTION ---");
+        try {
+            String id = readLine("ID: ");
+            String name = readLine("Name: ");
+            LocalDate start = readDate("Start date (YYYY-MM-DD): ");
+            LocalDate end = readDate("End date (YYYY-MM-DD): ");
+            double percentage = readPercentage();
+            promotionService.registerPercentageDiscount(id, name, start, end, percentage);
+            System.out.println("Promotion registered successfully.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
         }
-    
-        private static void registerPercentagePromotion(){
-            System.out.println("--- REGISTRAR PROMOCIÓN POR PORCENTAJE ---");
+    }
+
+    private static void registerCategoryPromotion(){
+        System.out.println("--- REGISTER CATEGORY PROMOTION ---");
+        try {
+            String id = readLine("ID: ");
+            String name = readLine("Name: ");
+            LocalDate start = readDate("Start date (YYYY-MM-DD): ");
+            LocalDate end = readDate("End date (YYYY-MM-DD): ");
+            double percentage = readPercentage();
+            String category = readLine("Category (VIDEOGAME or CONSOLE): ").toUpperCase();
+            if (!category.equals("VIDEOGAME") && !category.equals("CONSOLE")) {
+                throw new IllegalArgumentException("The category must be VIDEOGAME or CONSOLE.");
+            }
+        promotionService.registerCategoryDiscount(id, name, start, end, percentage, category);
+        System.out.println("Promotion registered successfully.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }  
+
+    private static void registerBulkPromotion(){
+        System.out.println("--- REGISTER BULK PURCHASE PROMOTION ---");
+        try {
+            String id = readLine("ID: ");
+            String name = readLine("Name: ");
+            LocalDate start = readDate("Start date (YYYY-MM-DD): ");
+            LocalDate end = readDate("End date (YYYY-MM-DD): ");
+            int minimum;
             try {
-                String id = readLine("ID: ");
-                String name = readLine("Nombre: ");
-                LocalDate start = readDate("Fecha de inicio (AAAA-MM-DD): ");
-                LocalDate end = readDate("Fecha de fin (AAAA-MM-DD): ");
-                double percentage = readPercentage();
-                promotionService.registerPercentageDiscount(id, name, start, end, percentage);
-                System.out.println("Promoción registrada correctamente.");
-            } catch (IllegalArgumentException e) {
-                System.out.println("Error: " + e.getMessage());
+                minimum = Integer.parseInt(readLine("Minimum number of products: "));
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("The minimum quantity must be a whole number.");
             }
+            if (minimum < 1) {
+                throw new IllegalArgumentException("The minimum quantity must be at least 1.");
+            }
+            double percentage = readPercentage();
+            promotionService.registerBulkPurchaseDiscount(id, name, start, end, minimum, percentage);
+            System.out.println("Promotion registered successfully.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
         }
-        
-        private static void registerCategoryPromotion(){
-            System.out.println("--- REGISTRAR PROMOCIÓN POR CATEGORÍA ---");
-            try {
-                String id = readLine("ID: ");
-                String name = readLine("Nombre: ");
-                LocalDate start = readDate("Fecha de inicio (AAAA-MM-DD): ");
-                LocalDate end = readDate("Fecha de fin (AAAA-MM-DD): ");
-                double percentage = readPercentage();
-                String category = readLine("Categoría (VIDEOGAME o CONSOLE): ").toUpperCase();
-                if (!category.equals("VIDEOGAME") && !category.equals("CONSOLE")) {
-                    throw new IllegalArgumentException("La categoría debe ser VIDEOGAME o CONSOLE.");
-                }
-                promotionService.registerCategoryDiscount(id, name, start, end, percentage, category);
-                System.out.println("Promoción registrada correctamente.");
-            } catch (IllegalArgumentException e) {
-                System.out.println("Error: " + e.getMessage());
-            }
+    }
+
+    private static void listPromotions(List<Promotion> promotions, String title, String emptyMessage){
+        System.out.println("--- " + title + " ---");
+        if (promotions.isEmpty()) {
+            System.out.println("  " + emptyMessage);
+            return;
         }
-        
-        private static void registerBulkPromotion(){
-            System.out.println("--- REGISTRAR PROMOCIÓN POR COMPRA AL POR MAYOR ---");
-            try {
-                String id = readLine("ID: ");
-                String name = readLine("Nombre: ");
-                LocalDate start = readDate("Fecha de inicio (AAAA-MM-DD): ");
-                LocalDate end = readDate("Fecha de fin (AAAA-MM-DD): ");
-                int minimum;
-                try {
-                    minimum = Integer.parseInt(readLine("Cantidad mínima de productos: "));
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("La cantidad mínima debe ser un número entero.");
-                }
-                if (minimum < 1) {
-                    throw new IllegalArgumentException("La cantidad mínima debe ser al menos 1.");
-                }
-                double percentage = readPercentage();
-                promotionService.registerBulkPurchaseDiscount(id, name, start, end, minimum, percentage);
-                System.out.println("Promoción registrada correctamente.");
-            } catch (IllegalArgumentException e) {
-                System.out.println("Error: " + e.getMessage());
-            }
+        LocalDate today = LocalDate.now();
+        for (Promotion p : promotions) {
+            System.out.println("  [" + p.getId() + "] " + p.getName()
+                    + " | " + describePromotion(p)
+                    + " | " + p.getStartDate() + " to " + p.getEndDate()
+                    + " | " + (p.isActive(today) ? "ACTIVE" : "NOT ACTIVE"));
         }
-        
-        private static void listPromotions(List<Promotion> promotions, String title, String emptyMessage){
-            System.out.println("--- " + title + " ---");
-            if (promotions.isEmpty()) {
-                System.out.println("  " + emptyMessage);
-                return;
-            }
-            LocalDate today = LocalDate.now();
-            for (Promotion p : promotions) {
-                System.out.println("  [" + p.getId() + "] " + p.getName()
-                        + " | " + describePromotion(p)
-                        + " | " + p.getStartDate() + " a " + p.getEndDate()
-                        + " | " + (p.isActive(today) ? "VIGENTE" : "NO VIGENTE"));
-            }
-        }
+    }
         
         private static String describePromotion(Promotion p){
             if (p instanceof PercentageDiscount) {
-                return "Porcentaje " + ((PercentageDiscount) p).getPercentage() + "% sobre el total";
+                return "Percentage " + ((PercentageDiscount) p).getPercentage() + "% off the total";
             } else if (p instanceof CategoryDiscount) {
                 CategoryDiscount c = (CategoryDiscount) p;
-                return "Categoría " + c.getTargetCategory() + " " + c.getPercentage() + "%";
+                return "Category " + c.getTargetCategory() + " " + c.getPercentage() + "%";
             } else if (p instanceof BulkPurchaseDiscount) {
                 BulkPurchaseDiscount b = (BulkPurchaseDiscount) p;
-                return "Mayorista: desde " + b.getMinimumQuantity() + " productos, " + b.getPercentage() + "%";
+                return "Wholesale: from " + b.getMinimumQuantity() + " products, " + b.getPercentage() + "%";
             }
             return p.getPromotionType();
         }
@@ -787,28 +799,149 @@ public static void main(String[] args) {
             System.out.print(prompt);
             return input.nextLine().trim();
         }
-        
+
         private static LocalDate readDate(String prompt){
             try {
                 return LocalDate.parse(readLine(prompt));
             } catch (DateTimeParseException e) {
-                throw new IllegalArgumentException("Fecha inválida. Use el formato AAAA-MM-DD (por ejemplo 2026-10-23).");
+                throw new IllegalArgumentException("Invalid date. Use the format YYYY-MM-DD (for example 2026-10-23).");
             }
         }
         
         private static double readPercentage(){
             double percentage;
             try {
-                percentage = Double.parseDouble(readLine("Porcentaje de descuento (1-100): ").replace(',', '.'));
+                percentage = Double.parseDouble(readLine("Discount percentage (1-100): ").replace(',', '.'));
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("El porcentaje debe ser un número.");
+                throw new IllegalArgumentException("The percentage must be a number.");
             }
             if (percentage <= 0 || percentage > 100) {
-                throw new IllegalArgumentException("El porcentaje debe estar entre 0 y 100.");
+                throw new IllegalArgumentException("The percentage must be between 0 and 100.");
             }
             return percentage;
-        }
+        }      
         
+        private static void showMonthlyBalance(){
+            System.out.println("--- MONTHLY BALANCE ---");
+            try {
+                int month = Integer.parseInt(readLine("Month (1-12): "));
+                int year = Integer.parseInt(readLine("Year (for example 2026): "));
+                if (month < 1 || month > 12) {
+                    System.out.println("The month must be between 1 and 12.");
+                    return;
+                }
+                double totalSales = saleService.getMonthlySalesTotal(month, year);
+                double netBalance = returnService.generateMonthlyBalance(month, year);
+                double totalReturns = totalSales - netBalance;
+                System.out.println("Total sales            : $" + String.format("%.2f", totalSales));
+                System.out.println("Total returns          : $" + String.format("%.2f", totalReturns));
+                System.out.println("NET BALANCE            : $" + String.format("%.2f", netBalance));
+            } catch (NumberFormatException e) {
+            System.out.println("Please enter valid numbers for the month and year.");
+            }
+        }
+        private static void showReturnMenu(){
+            boolean back = false;
+            while (!back) {
+                System.out.println("\n--- RETURNS MANAGEMENT ---");
+                System.out.println("  1. Register a return");
+                System.out.println("  2. View all returns");
+                System.out.println("  3. View returns by customer");
+                System.out.println("  4. View returns by sale");
+                System.out.println("  5. View monthly balance");
+                System.out.println("  0. Back to main menu");
+                String text = readLine("Select an option: ");
+                int option;
+                try {
+                    option = Integer.parseInt(text);
+                } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+                continue;
+            }
+            switch (option) {
+                case 1:
+                    registerReturn();
+                    break;
+                case 2:
+                    printReturns(returnService.viewAllReturns(),
+                            "ALL RETURNS", "There are no registered returns.");
+                    break;
+                case 3:
+                    String customerId = readLine("Customer ID: ");
+                    printReturns(returnService.viewReturnsByCustomer(customerId),
+                        "RETURNS FOR CUSTOMER " + customerId,
+                        "This customer has no returns.");
+                    break;
+                case 4:
+                    String saleId = readLine("Sale ID: ");
+                    printReturns(returnService.viewReturnsBySale(saleId),
+                        "RETURNS FOR SALE " + saleId,
+                        "This sale has no returns.");
+                    break;
+                case 5:
+                    showMonthlyBalance();
+                    break;
+                case 0:
+                    back = true;
+                    break;
+                default:
+                    System.out.println("Invalid option.");
+            }
+        }
+    }
+
+    private static void registerReturn(){
+        System.out.println("--- REGISTER RETURN ---");
+        String saleId = readLine("Sale ID: ");
+        Sale sale = saleService.findSaleById(saleId).orElse(null);
+        if (sale == null) {
+            System.out.println("No sale exists with the id " + saleId + ".");
+            return;
+        }
+        if (!sale.canBeReturned()) {
+            System.out.println("Sale " + saleId + " has already exceeded the 30-day return period.");
+            return;
+        }
+        System.out.println("Products in the sale:");
+        for (Product p : sale.getProducts()) {
+            System.out.println("  - [" + p.getId() + "] " + p.getTitle() + " ($" + p.getPrice() + ")");
+        }
+        String line = readLine("IDs of the products to return (separated by commas): ");
+        List<String> productIds = new ArrayList<>();
+        for (String part : line.split(",")) {
+            String productId = part.trim();
+            if (!productId.isEmpty()) {
+                productIds.add(productId);
+            }
+        }
+        if (productIds.isEmpty()) {
+            System.out.println("You must indicate at least one product.");
+            return;
+        }
+        String reason = readLine("Reason for the return: ");
+        try {
+            Return returnItem = returnService.registerReturn(saleId, productIds, reason);
+            System.out.println("Return registered successfully.");
+            System.out.println(returnItem.generateReturnReceipt());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private static void printReturns(List<Return> returns, String title, String emptyMessage){
+        System.out.println("--- " + title + " ---");
+        if (returns.isEmpty()) {
+            System.out.println("  " + emptyMessage);
+            return;
+        }
+        for (Return r : returns) {
+            System.out.println("  [" + r.getId() + "] " + r.getDate()
+                + " | Sale " + r.getSale().getId()
+                + " | " + r.getReturnedProducts().size() + " product(s)"
+                + " | Refund $" + String.format("%.2f", r.getRefundAmount())
+                + " | Reason: " + r.getReason());
+        }
+    }
         
 }
     

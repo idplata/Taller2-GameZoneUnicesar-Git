@@ -7,6 +7,8 @@ import com.gamezone.model.*;
 import com.gamezone.persistence.SaleRepository;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
+import java.util.ArrayList;
 
 /**
  *
@@ -31,7 +33,7 @@ public class SaleService {
         
     }
     
-    public void registerSale(Sale sale){
+   public void registerSale(Sale sale, List<String> productIdsWithExtendedWarranty) {
     
      if(sale.getProducts() == null || sale.getProducts().isEmpty()){
      
@@ -77,8 +79,8 @@ public class SaleService {
             sale.setAppliedPromotionName(best.getName());
             sale.setDiscountAmount(best.calculateDiscount(sale));
         }
-     
-     saleRepository.saveSales(sale);
+        applyWarranties(sale, productIdsWithExtendedWarranty);
+        saleRepository.saveSales(sale);
     }
     
     
@@ -123,6 +125,29 @@ public class SaleService {
         return false;
     }
     
+    }
+    
+        /**
+     * Assigns a basic warranty to every console in the sale and an extended warranty
+     * to the consoles requested by the seller, adding the extra cost to the sale total.
+     *
+     * @param sale        the sale being registered
+     * @param extendedIds ids of the consoles that get an extended warranty; may be null
+     */
+    private void applyWarranties(Sale sale, List<String> extendedIds) {
+        List<String> remaining = extendedIds == null ? new ArrayList<>() : new ArrayList<>(extendedIds);
+        LocalDate startDate = sale.getDate().toLocalDate();
+        double extraCost = 0;
+        for (Product product : sale.getProducts()) {
+            if (product instanceof Console) {
+                warrantyService.assignBasicWarranty(product, sale, startDate);
+                if (remaining.remove(product.getId())) {
+                    ExtendedWarranty extended = warrantyService.assignExtendedWarranty(product, sale, startDate);
+                    extraCost += extended.getAdditionalCost();
+                }
+            }
+        }
+        sale.setExtendedWarrantyCost(extraCost);
     }
    }
 

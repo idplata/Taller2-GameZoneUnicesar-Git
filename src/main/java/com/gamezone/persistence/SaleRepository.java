@@ -40,7 +40,7 @@ public class SaleRepository {
         load();
     }
     
-    public void savesales(Sale sale){
+    public void saveSales(Sale sale){
         sales.add(sale); 
         persist();
     }
@@ -52,7 +52,7 @@ public class SaleRepository {
         List<Sale> result = new ArrayList<>();
         for(Sale s: sales){
             
-            if (s.getcostumer().getId().equals(customerId)){
+            if (s.getCustomer().getId().equals(customerId)){
             
                 result.add(s);
                 
@@ -70,7 +70,7 @@ public class SaleRepository {
         
         for(Sale s: sales){
         
-            if(s.getseller().getId().equals(SellerId)){
+            if(s.getSeller().getId().equals(SellerId)){
             
                 result.add(s);
             }

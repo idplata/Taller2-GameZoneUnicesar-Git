@@ -3,7 +3,7 @@ package com.gamezone.service;
 import com.gamezone.model.Product;
 import com.gamezone.persistence.ProductRepository;
 import java.util.List;
-
+import java.util.Optional;
 /**
  * Service class for product business logic.
  */
@@ -66,5 +66,19 @@ public class ProductService {
     
     private void saveData() {
         repository.save(products);
+    }
+    
+    public boolean restoreStock(String productId, int quantity) {
+        Product product = findById(productId);
+        if (product == null || quantity <= 0) {
+            return false;
+        }
+        product.setQuantity(product.getQuantity() + quantity);
+        saveData();
+        return true;
+    }
+    
+    public Optional<Product> findProductById(String productId) {
+        return Optional.ofNullable(findById(productId));
     }
 }

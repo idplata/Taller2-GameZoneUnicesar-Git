@@ -5,6 +5,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.gamezone.model.Promotion;
+import com.gamezone.model.PercentageDiscount;
+import com.gamezone.model.CategoryDiscount;
+import com.gamezone.model.BulkPurchaseDiscount;
+import com.gamezone.model.Sale;
+import com.gamezone.persistence.PromotionRepository;
+
 /*
  * Contiene las reglas de negocio del módulo de promociones: registrar
  * nuevas promociones de cada tipo, listar todas o solo las vigentes, y

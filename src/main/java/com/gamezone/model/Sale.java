@@ -21,6 +21,7 @@ public class Sale implements Serializable {
     private List<Product> products;
     private String appliedPromotionName;
     private double discountAmount;
+    private double extendedWarrantyCost;
     
     public Sale(String saleId, Customer customer, Seller seller, List<Product> products){
         this.date = LocalDateTime.now(); //I used AI for getting this specific function
@@ -36,6 +37,7 @@ public class Sale implements Serializable {
     public Seller getSeller(){return seller;}
     public List<Product> getProducts(){return new ArrayList<>(products);}
     public LocalDateTime getDate(){return date;}
+    public double getExtendedWarrantyCost() { return extendedWarrantyCost; }
 
     public String getAppliedPromotionName() { return appliedPromotionName; }
     public double getDiscountAmount() { return discountAmount; }
@@ -46,6 +48,7 @@ public class Sale implements Serializable {
     public void setSeller(Seller seller){this.seller = seller;}
     public void setProducts(List<Product> products){this.products = new ArrayList<>(products);}
     public void setDate(LocalDateTime date){this.date = date;}
+    public void setExtendedWarrantyCost(double extendedWarrantyCost) { this.extendedWarrantyCost = extendedWarrantyCost; }
     
     
     
@@ -68,7 +71,7 @@ public class Sale implements Serializable {
 
 
     public double getTotal() {
-            return calculateSubtotal() - discountAmount;
+             return calculateSubtotal() - discountAmount + extendedWarrantyCost;
        }
     
     public String generateReceipt() {
@@ -85,6 +88,10 @@ public class Sale implements Serializable {
         if (appliedPromotionName != null) {
             receipt.append("Descuento (").append(appliedPromotionName).append(") : -$")
                .append(String.format("%.2f", discountAmount)).append("\n");
+        }
+        if (extendedWarrantyCost > 0) {
+            receipt.append("Garantía extendida : +$")
+                   .append(String.format("%.2f", extendedWarrantyCost)).append("\n");
         }
             receipt.append("TOTAL    : $").append(String.format("%.2f", getTotal())).append("\n");
             return receipt.toString();

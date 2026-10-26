@@ -138,3 +138,73 @@ I used this as a template to create our project's README.md.
 
 **Human Contribution:**
 I wrote all the specific content about our project, including team details, actual installation commands, and accurate descriptions of our features and architecture. The AI only provided the structural outline.
+
+### Session 8: Integrating Accessory Category into Discounts (A1)
+**Date:** October 26, 2026
+**Tool:** Claude
+
+**Consultation:**
+I needed to adapt the `CategoryDiscount` logic so that it would accept accessories (`ACCESSORY`) as a valid target category, given that the new accessory module was now integrated.
+
+**Response Received:**
+The AI suggested adding a validation method (`isAllowedCategory`) to check for the three valid categories and provided an example of the conditional logic inside the `calculateDiscount` method.
+
+**Application to Project:**
+I applied the validation structure to ensure the system rejects invalid categories. I also updated the console menu to allow the user to type "ACCESSORY" when registering a promotion by category.
+
+**Human Contribution:**
+I adapted the provided logic to my existing `CategoryDiscount` and `PromotionService` classes. I manually tested the flow to ensure the discount was applied correctly only to accessories, keeping the rest of the sale total intact.
+
+---
+
+### Session 9: Fixing the Discounted Refund Calculation (A5)
+**Date:** October 26, 2026
+**Tool:** Claude
+
+**Consultation:**
+When a sale had a promotion applied, the return system was refunding the full list price of the item instead of the discounted price. I asked for a mathematical approach to fix this in the `Return` class.
+
+**Response Received:**
+The AI explained how to calculate a proportional discount per item using the formula `price × (1 - totalDiscount / subtotal)`. It also suggested helper methods to structure the receipt breakdown.
+
+**Application to Project:**
+I used the proportional formula to ensure the customer is refunded exactly what they paid. I updated the `generateReturnReceipt` to display the item's list price, its proportional discount, and the final refunded amount.
+
+**Human Contribution:**
+I implemented the math inside the `Return` entity, ensuring the division by zero was handled if a subtotal was 0. I adapted the receipt strings to match the existing Spanish output format required by the UI.
+
+---
+
+### Session 10: Unifying the Sale Registration Flow (A3)
+**Date:** October 26, 2026
+**Tool:** Claude
+
+**Consultation:**
+The `SaleService.registerSale` method was getting too complex to handle stock validation, promotions, and warranties all at once without leaving the inventory in a broken state if an error occurred.
+
+**Response Received:**
+The AI proposed a step-by-step transactional flow: validate everything first, discount the stock, and use a `try-catch` block. If any step after discounting fails, it triggers a `restoreStock` rollback.
+
+**Application to Project:**
+I adapted this structure into the `SaleService`. I also updated the `Sale` entity to store the extended warranty cost and reflect it in the final total and the `generateReceipt()` method.
+
+**Human Contribution:**
+I wrote the complete logic for grouping items using `Map<String, Integer>` to avoid issues with duplicated products in the cart. I manually integrated the UI flow so the system asks the user for extended warranties before finalizing the sale.
+
+---
+
+### Session 11: Resolving Compilation and Serialization Errors
+**Date:** October 26, 2026
+**Tool:** Claude
+
+**Consultation:**
+The project was failing to compile, and even after compiling, saving sales to the `.dat` file was throwing a `NotSerializableException`. I asked for the common causes of these errors.
+
+**Response Received:**
+The AI pointed out that class names must perfectly match the file names (e.g., `Basicwarranty.java` vs `BasicWarranty.java`) and explained that all objects inside a serialized class must also implement `Serializable`.
+
+**Application to Project:**
+I renamed the warranty file to fix the compilation issue and made the `Person` class implement `Serializable` so that `Sale` objects (which contain `Customer` and `Seller`) could be saved correctly.
+
+**Human Contribution:**
+I debugged the NetBeans output to find the exact lines causing the issue. I applied the serialization fix and successfully verified that the `sales.dat` file was being written and read without data loss.

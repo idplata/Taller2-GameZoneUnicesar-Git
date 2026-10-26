@@ -71,7 +71,7 @@ public class SaleService {
                     throw e;
             }
         }
-    
+
     
     public List<Sale> getAllSales(){
     
@@ -103,8 +103,9 @@ public class SaleService {
 
             total += sale.getTotal();
         }
-        return total;
+     return total;
     }
+    
     
     
     private void countUnits(Sale sale, Map<String, Integer> productUnits, Map<String, Integer> accessoryUnits) {
@@ -140,8 +141,7 @@ public class SaleService {
             }
         }
     }
-    
-    private void validateExtendedWarrantyRequests(Sale sale, List<String> extendedIds) {
+        private void validateExtendedWarrantyRequests(Sale sale, List<String> extendedIds) {
         Map<String, Integer> consoleUnits = new LinkedHashMap<>();
         for (Product p : sale.getProducts()) {
             if (p instanceof Console) {
@@ -208,6 +208,7 @@ public class SaleService {
             }
         }
         return total;
+
     }
 }
 

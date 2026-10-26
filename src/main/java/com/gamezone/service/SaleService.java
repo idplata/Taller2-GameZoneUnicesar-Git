@@ -109,34 +109,28 @@ public class SaleService {
     }
    
     public double getTotalRevenue() {
-    double total = 0;
-    for (Sale sale : saleRepository.findAllSales()) {
+        double total = 0;
+        for (Sale sale : saleRepository.findAllSales()) {
 
-        total += sale.getTotal();
+            total += sale.getTotal();
+        }
+     return total;
     }
-    return total;
-}
     
     
     private boolean hasEnoughStockAccesory(String id, int amount){
     
-    try{
+        try{
     
-        Accesory accesory = accesoryService.findById(id);
-        return accesory.getQuantity() >= amount;
-    } catch (Exception e){
-        return false;
+            Accesory accesory = accesoryService.findById(id);
+            return accesory.getQuantity() >= amount;
+        } catch (Exception e){
+            return false;
+        }
+    
     }
     
-    }
-    
-        /**
-     * Assigns a basic warranty to every console in the sale and an extended warranty
-     * to the consoles requested by the seller, adding the extra cost to the sale total.
-     *
-     * @param sale        the sale being registered
-     * @param extendedIds ids of the consoles that get an extended warranty; may be null
-     */
+
     private void applyWarranties(Sale sale, List<String> extendedIds) {
         List<String> remaining = extendedIds == null ? new ArrayList<>() : new ArrayList<>(extendedIds);
         LocalDate startDate = sale.getDate().toLocalDate();
@@ -150,7 +144,7 @@ public class SaleService {
                 }
             }
         }
-        sale.setExtendedWarrantyCost(extraCost);
+        sale.setExtendedWarrantyCost(extraCost);}
 
      public double getMonthlySalesTotal(int month, int year) {
         double total = 0;

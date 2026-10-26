@@ -7,6 +7,8 @@ import com.gamezone.model.*;
 import com.gamezone.persistence.SaleRepository;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
+import java.util.ArrayList;
 
 /**
  *
@@ -31,7 +33,7 @@ public class SaleService {
         
     }
     
-    public void registerSale(Sale sale){
+   public void registerSale(Sale sale, List<String> productIdsWithExtendedWarranty) {
     
      if(sale.getProducts() == null || sale.getProducts().isEmpty()){
      
@@ -77,8 +79,8 @@ public class SaleService {
             sale.setAppliedPromotionName(best.getName());
             sale.setDiscountAmount(best.calculateDiscount(sale));
         }
-     
-     saleRepository.saveSales(sale);
+        applyWarranties(sale, productIdsWithExtendedWarranty);
+        saleRepository.saveSales(sale);
     }
     
     
@@ -107,27 +109,43 @@ public class SaleService {
     }
    
     public double getTotalRevenue() {
-    double total = 0;
-    for (Sale sale : saleRepository.findAllSales()) {
+        double total = 0;
+        for (Sale sale : saleRepository.findAllSales()) {
 
-        total += sale.getTotal();
+            total += sale.getTotal();
+        }
+     return total;
     }
-    return total;
-}
     
     
     private boolean hasEnoughStockAccesory(String id, int amount){
     
-    try{
+        try{
     
-        Accesory accesory = accesoryService.findById(id);
-        return accesory.getQuantity() >= amount;
-    } catch (Exception e){
-        return false;
+            Accesory accesory = accesoryService.findById(id);
+            return accesory.getQuantity() >= amount;
+        } catch (Exception e){
+            return false;
+        }
+    
     }
     
-    }
-    
+
+    private void applyWarranties(Sale sale, List<String> extendedIds) {
+        List<String> remaining = extendedIds == null ? new ArrayList<>() : new ArrayList<>(extendedIds);
+        LocalDate startDate = sale.getDate().toLocalDate();
+        double extraCost = 0;
+        for (Product product : sale.getProducts()) {
+            if (product instanceof Console) {
+                warrantyService.assignBasicWarranty(product, sale, startDate);
+                if (remaining.remove(product.getId())) {
+                    ExtendedWarranty extended = warrantyService.assignExtendedWarranty(product, sale, startDate);
+                    extraCost += extended.getAdditionalCost();
+                }
+            }
+        }
+        sale.setExtendedWarrantyCost(extraCost);}
+
      public double getMonthlySalesTotal(int month, int year) {
         double total = 0;
         for (Sale sale : getAllSales()) {
@@ -136,6 +154,7 @@ public class SaleService {
             }
         }
         return total;
+
     }
    }
 

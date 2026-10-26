@@ -73,6 +73,8 @@ public static void main(String[] args) {
                    System.out.println("--- RETURNS ---");
                    System.out.println(" 14. Returns management");
                    System.out.println(" 15. Monthly balance");
+                   System.out.println("--- WARRANTIES ---");
+                   System.out.println(" 16. Warranty management");
                    System.out.println(" 0. EXIT ");
                    System.out.println("\n SELECT AN OPTION PLEASE");
                    
@@ -125,6 +127,9 @@ public static void main(String[] args) {
                             break;
                         case 15:
                             showMonthlyBalance();
+                            break;
+                        case 16:
+                            showWarrantyMenu();
                             break;
                         case 0:
                             System.out.println("¡GRACIAS POR USAR GAMEZONE UNICESAR!");
@@ -566,8 +571,20 @@ public static void main(String[] args) {
         
         String saleId = "S-" + System.currentTimeMillis();
         Sale sale = new Sale(saleId, customer, seller, selectedProducts);
+        List<String> extendedWarrantyIds = new ArrayList<>();
+        for (Product p : selectedProducts) {
+            if (p instanceof Console) {
+                System.out.print("Do you want to add an extended warranty to the console " + p.getTitle()
+                        + " (additional cost: 10% of the price)? (y/n): ");
+                String answer = input.next().trim();
+                if (answer.equalsIgnoreCase("y") || answer.equalsIgnoreCase("yes")
+                        || answer.equalsIgnoreCase("yes")) {
+                    extendedWarrantyIds.add(p.getId());
+                }
+            }
+        }
         try {
-            saleService.registerSale(sale);
+            saleService.registerSale(sale, extendedWarrantyIds);
             System.out.println("Sale registered successfully!");
             System.out.println(sale.generateReceipt());
         } catch (IllegalArgumentException e) {
@@ -943,6 +960,88 @@ public static void main(String[] args) {
         }
     }
         
+    private static void showWarrantyMenu(){
+        boolean back = false;
+        while (!back) {
+            System.out.println("\n--- WARRANTY MANAGEMENT ---");
+            System.out.println("  1. Check the warranty of a product in a sale");
+            System.out.println("  2. List all warranties");
+            System.out.println("  3. List active warranties");
+            System.out.println("  4. List warranties expiring soon");
+            System.out.println("  0. Back to main menu");
+            String text = readLine("Select an option: ");
+            int option;
+            try {
+                option = Integer.parseInt(text);
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+                continue;
+            }
+            switch (option) {
+                case 1:
+                    findWarranty();
+                    break;
+                case 2:
+                    printWarranties(warrantyService.listAllWarranties(),
+                        "ALL WARRANTIES", "There are no registered warranties.");
+                    break;
+                case 3:
+                    printWarranties(warrantyService.listActiveWarranties(),
+                        "ACTIVE WARRANTIES", "There are no active warranties today.");
+                    break;
+                case 4:
+                    listWarrantiesExpiringSoon();
+                    break;
+                case 0:
+                    back = true;
+                    break;
+                default:
+                    System.out.println("Invalid option.");
+            }
+        }
+    }
+
+    private static void findWarranty(){
+        String productId = readLine("Product ID: ");
+        String saleId = readLine("Sale ID: ");
+        Warranty warranty = warrantyService.findWarrantyByProduct(productId, saleId);
+        if (warranty == null) {
+            System.out.println("There is no warranty for product " + productId
+                + " in sale " + saleId + ".");
+            return;
+        }
+        System.out.println(warranty.generateWarrantyCertificate());
+        System.out.println("Status: " + (warranty.isActive(LocalDate.now()) ? "ACTIVE" : "EXPIRED"));
+    }
+
+    private static void listWarrantiesExpiringSoon(){
+        try {
+            int days = Integer.parseInt(readLine("Days in advance: "));
+            if (days < 0) {
+                System.out.println("Days cannot be negative.");
+                return;
+            }
+            printWarranties(warrantyService.listWarrantiesExpiringSoon(days),
+                "WARRANTIES EXPIRING IN THE NEXT " + days + " DAYS",
+                "There are no warranties expiring soon.");
+        } catch (NumberFormatException e) {
+            System.out.println("Please enter a valid whole number.");
+        }
+    }
+
+    private static void printWarranties(List<Warranty> warranties, String title, String emptyMessage){
+        System.out.println("--- " + title + " ---");
+        if (warranties.isEmpty()) {
+            System.out.println("  " + emptyMessage);
+            return;
+        }
+        for (Warranty w : warranties) {
+            System.out.println("  [" + w.getId() + "] " + w.getWarrantyType()
+                + " | " + w.getProduct().getTitle()
+                + " | Sale " + w.getSale().getId()
+                + " | " + w.getStartDate() + " to " + w.getEndDate());
+        }
+    }
 }
     
 

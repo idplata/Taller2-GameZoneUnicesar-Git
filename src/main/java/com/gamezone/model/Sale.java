@@ -102,7 +102,7 @@ public class Sale implements Serializable {
         LocalDate limit = saleDate.plusDays(30);
         return !LocalDate.now().isAfter(limit);
     }
-    
+
     @Override
     public String toString(){
         

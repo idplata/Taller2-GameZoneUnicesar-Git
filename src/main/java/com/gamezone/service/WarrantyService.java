@@ -90,7 +90,7 @@ public class WarrantyService {
     public Warranty findWarrantyByProduct(String productId, String saleId) {
         return warranties.stream()
                 .filter(warranty -> warranty.getProduct().getId().equals(productId)
-                        && warranty.getSale().getid().equals(saleId))
+                        && warranty.getSale().getId().equals(saleId))
                 .findFirst()
                 .orElse(null);
     }
@@ -139,7 +139,7 @@ public class WarrantyService {
     private void loadWarranties(SaleRepository saleRepository, ProductService productService) {
         Map<String, Sale> salesById = new HashMap<>();
         for (Sale sale : saleRepository.findAllSales()) {
-            salesById.put(sale.getid(), sale);
+            salesById.put(sale.getId(), sale);
         }
 
         for (WarrantyRecord record : repository.loadAll()) {
